@@ -132,17 +132,14 @@ class TMC2209(Nema17):
 
         try:
             for step in range(num_steps):
-                # if self._stop_motor:
-                #     raise StopMotor
-                # else:
-                GPIO.output(self._step_pin, True)
-                time.sleep(step_delay)
+                if self._stop_motor:
+                    raise StopMotor
+                else:
+                    GPIO.output(self._step_pin, True)
+                    time.sleep(step_delay)
 
-                GPIO.output(self._step_pin, False)
-                time.sleep(step_delay)
-
-                # if self._verbose:
-                #     print(f"Step count {step + 1}", end="\r", flush=True)
+                    GPIO.output(self._step_pin, False)
+                    time.sleep(step_delay)
 
             if self._verbose:
                 print("Motor has moved:")
@@ -199,7 +196,7 @@ def main():
         direction_pin,
         enable_pin,
         microstep_pins=microstep_pins,
-        verbose=False,
+        verbose=True,
     )
 
     time.sleep(0.5)
