@@ -15,7 +15,7 @@ class StepperMotorController:
     FULL_STEPS_PER_TURN = None
 
     def __init__(self, step_pin, direction_pin, microstep_pins=(), microsteps=1):
-        """ Nema 17 stepper motor control class.
+        """ Stepper motor control class.
 
         Note: Uses BOARD mode for compatibility with more Pi versions.
 
