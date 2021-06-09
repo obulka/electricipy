@@ -7,6 +7,8 @@ import time
 # 3rd Party Imports
 import RPi.GPIO as GPIO
 
+# Local Imports
+from ..signals.waveforms.pwm import PWM
 
 class StepperMotorController:
     """ Base class for control of stepper motors. """
@@ -17,7 +19,7 @@ class StepperMotorController:
     def __init__(self, step_pin, direction_pin, microstep_pins=(), microsteps=1):
         """ Stepper motor control class.
 
-        Note: Uses BOARD mode for compatibility with more Pi versions.
+        Note: Uses BCM mode for compatibility with pigpio.
 
         Args:
             step_pin (int): The step pin number to use.
@@ -33,7 +35,7 @@ class StepperMotorController:
                 controller to operate correctly. The default 1 microstep
                 means the motor is taking full steps.
         """
-        GPIO.setmode(GPIO.BOARD)
+        GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
 
         self._step_pin = step_pin
@@ -56,6 +58,16 @@ class StepperMotorController:
     def clockwise(self, rotate_clockwise):
         self._clockwise = rotate_clockwise
 
+    @property
+    def microsteps(self):
+        """ int: The number of microsteps to take. """
+        return self._microsteps
+
+    @microsteps.setter
+    def microsteps(self, microsteps):
+        self._check_microstep_value(microsteps)
+        self._microsteps = microsteps
+
     def _check_microstep_value(self, microsteps):
         """ Check if a number of microsteps is a valid option.
 
@@ -67,16 +79,6 @@ class StepperMotorController:
                 f"Invalid number of microsteps: {microsteps}\n"
                 f"Valid options are {self.MICROSTEPS.keys()}"
             )
-
-    @property
-    def microsteps(self):
-        """ int: The number of microsteps to take. """
-        return self._microsteps
-
-    @microsteps.setter
-    def microsteps(self, microsteps):
-        self._check_microstep_value(microsteps)
-        self._microsteps = microsteps
 
     def _initialize_gpio(self):
         """ Initialize the GPIO pins. """
@@ -104,6 +106,10 @@ class StepperMotorController:
     def step_motor(self, num_steps, step_delay=5e-4):
         """ Step the motor a number of times.
 
+        Note that this method guarantees the correct number of steps but
+        does not guarantee that the time will be accurate due to the
+        limitations of the operating system.
+
         Args:
             num_steps (int): Number of steps to perform.
 
@@ -130,16 +136,16 @@ class StepperMotorController:
         finally:
             self._cleanup_gpio()
 
-    def _degrees_to_steps(self, degrees):
+    def _angle_to_steps(self, angle):
         """ Convert a number of degrees to the closest number of steps.
 
         Args:
-            degrees (float): The number of degrees.
+            angle (float): The number of degrees.
 
         Returns:
             int: The equivalent number of steps.
         """
-        return round(self.FULL_STEPS_PER_TURN * self._microsteps * degrees / 360.)
+        return round(self.FULL_STEPS_PER_TURN * self._microsteps * angle / 360.)
 
     def _speed_to_step_delay(self, speed):
         """ Convert a speed to the time a step pulse should be held high.
@@ -152,26 +158,52 @@ class StepperMotorController:
         """
         return 180. / (self.FULL_STEPS_PER_TURN * self._microsteps * speed)
 
-    def move_motor_at_speed(self, degrees, speed):
+    def move_motor_by_angle_at_speed(self, angle, speed):
         """ Move the motor a number of degrees at a speed.
 
+        Note that this method guarantees the correct number of degrees but
+        does not guarantee that the time will be accurate due to the
+        limitations of the operating system.
+
         Args:
-            degrees (float): Number of degrees to move.
+            angle (float): Number of degrees to move.
             speed (float): Speed in degrees/second to move at.
         """
-        steps = self._degrees_to_steps(degrees)
+        steps = self._degrees_to_steps(angle)
         step_delay = self._speed_to_step_delay(speed)
 
         self.step_motor(steps, step_delay)
 
-    def move_motor_in_time(self, degrees, seconds):
+    def move_motor_by_angle_in_time(self, angle, seconds):
         """ Move the motor a number of degrees in a period of time.
 
+        Note that this method guarantees the correct number of degrees but
+        does not guarantee that the time will be accurate due to the
+        limitations of the operating system.
+
         Args:
-            degrees (float): Number of degrees to move.
-            seconds (float): Time in which to move the motor by degrees.
+            angle (float): Number of degrees to move.
+            time (float): Time in which to move the motor by degrees.
         """
-        self.move_motor_at_speed(degrees, degrees / seconds)
+        self.move_motor_at_speed(angle, angle / seconds)
+
+    def move_motor_at_speed_for_time(self, speed, seconds):
+        """ Move the motor a number of degrees in a period of time.
+
+        Note that this method guarantees the correct speed but
+        does not guarantee that the time will be accurate due to the
+        limitations of the operating system.
+
+        Args:
+            speed (float): Speed in degrees/second to move at.
+            time (float): Time to move the motor for.
+        """
+        pwm = PWM((self._step_pin,))
+        pwm.period = self._speed_to_step_delay(speed) * 2
+        pwm.set_pulse_length_in_percentage(self._step_pin, 0.5)
+        pwm.update()
+        time.sleep(seconds)
+        pwm.stop()
 
 
 class TMC2209(StepperMotorController):

@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 rpi = "*"
 "rpi.gpio" = "*"
+pigpio = "*"
 
 [dev-packages]
 pylint = "*"
