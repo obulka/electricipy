@@ -53,16 +53,10 @@ class PWM:
         self._frequency = frequency
         self._period = 1000000 / frequency
 
-        self._pins = {pin: (0., 0.) for pin in pins}
+        self._pins = {pin: [0., 0.] for pin in pins}
 
         self._current_wave_id = None
         self._stop = False
-
-    def __del__(self):
-        """ Cleanup """
-        self.stop()
-        if self.__internal_pi_connection:
-            self._pi.stop()
 
     @property
     def frequency(self):
@@ -104,7 +98,7 @@ class PWM:
             )
 
         if pin not in self._pins:
-            self._pins[pin] = (0., 0.)
+            self._pins[pin] = [0., 0.]
 
         self._pins[pin][1] = pulse_length / self._period
 
@@ -130,7 +124,7 @@ class PWM:
             )
 
         if pin not in self._pins:
-            self._pins[pin] = (0., 0.)
+            self._pins[pin] = [0., 0.]
 
         self._pins[pin][0] = pulse_start / self._period
 
@@ -155,13 +149,13 @@ class PWM:
                 The pulse length in microseconds for the given pin,
                 or None if the pin is not used.
         """
-        return self._pins.get(pin, (None, None))
+        return self._pins.get(pin, [None, None])
 
     def update(self):
         """ Updates the PWM to reflect the current settings. """
         self._initialize_gpio()
 
-        for pin, (pulse_start, pulse_length) in self._pins:
+        for pin, (pulse_start, pulse_length) in self._pins.items():
             on_time = round(pulse_start * self._period)
             length = round(pulse_length * self._period)
             period = round(self._period)
@@ -215,7 +209,8 @@ class PWM:
         """
         self._stop = True
 
-        self._pi.wave_tx_stop()
+        if self._pi:
+            self._pi.wave_tx_stop()
 
         if self._current_wave_id is not None:
             self._pi.wave_delete(self._current_wave_id)

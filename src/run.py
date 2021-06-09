@@ -13,7 +13,7 @@ def main():
     direction_pin = 3
     enable_pin = 4
     microstep_pins = [15, 14]
-    microsteps = 8
+    microsteps = 64
 
     motor = stepper.TMC2209(
         step_pin,
@@ -24,7 +24,8 @@ def main():
     )
 
     for _ in range(3):
-        motor.move_motor_at_speed_for_time(180., 1.)
+        motor.move_motor_at_speed_for_time(360.* .5, 1.)
+        # motor.move_motor_by_angle_in_time(180., 1.)
         time.sleep(1)
 
 

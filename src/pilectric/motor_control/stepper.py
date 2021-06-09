@@ -147,16 +147,28 @@ class StepperMotorController:
         """
         return round(self.FULL_STEPS_PER_TURN * self._microsteps * angle / 360.)
 
-    def _speed_to_step_delay(self, speed):
-        """ Convert a speed to the time a step pulse should be held high.
+    def _angular_speed_to_step_speed(self, speed):
+        """ Convert a speed in degrees/second to steps/second.
 
         Args:
             speed (float): The speed in degrees/second.
 
         Returns:
-            float: The equivalent pulse time.
+            float: The equivalent speed in steps/second.
         """
-        return 180. / (self.FULL_STEPS_PER_TURN * self._microsteps * speed)
+        return self.FULL_STEPS_PER_TURN * self._microsteps * speed / 360.
+
+    def _angular_speed_to_step_delay(self, speed):
+        """ Convert a speed in degrees/second to the step delay
+        (half pulse period).
+
+        Args:
+            speed (float): The speed in degrees/second.
+
+        Returns:
+            float: The equivalent pulse time in seconds.
+        """
+        return 1 / (2 * self._angular_speed_to_step_speed(speed))
 
     def move_motor_by_angle_at_speed(self, angle, speed):
         """ Move the motor a number of degrees at a speed.
@@ -169,8 +181,10 @@ class StepperMotorController:
             angle (float): Number of degrees to move.
             speed (float): Speed in degrees/second to move at.
         """
-        steps = self._degrees_to_steps(angle)
-        step_delay = self._speed_to_step_delay(speed)
+        steps = self._angle_to_steps(angle)
+        step_delay = self._angular_speed_to_step_delay(speed)
+        print("Steps:", steps)
+        print("Step delay:", step_delay)
 
         self.step_motor(steps, step_delay)
 
@@ -185,25 +199,41 @@ class StepperMotorController:
             angle (float): Number of degrees to move.
             time (float): Time in which to move the motor by degrees.
         """
-        self.move_motor_at_speed(angle, angle / seconds)
+        self.move_motor_by_angle_at_speed(angle, angle / seconds)
 
-    def move_motor_at_speed_for_time(self, speed, seconds):
+    def move_motor_at_speed_for_time(self, speed, seconds, pulse_time=1):
         """ Move the motor a number of degrees in a period of time.
 
         Note that this method guarantees the correct speed but
         does not guarantee that the time will be accurate due to the
         limitations of the operating system.
 
+        Also note that the step pin must be able to use hardware PWM.
+
         Args:
             speed (float): Speed in degrees/second to move at.
             time (float): Time to move the motor for.
+
+        Keyword Args:
+            pulse_time (float):
+                Time the step pulse is high in microseconds. May not
+                work lower than 1.
         """
-        pwm = PWM((self._step_pin,))
-        pwm.period = self._speed_to_step_delay(speed) * 2
-        pwm.set_pulse_length_in_percentage(self._step_pin, 0.5)
-        pwm.update()
-        time.sleep(seconds)
-        pwm.stop()
+        self._stop_motor = False
+
+        self._initialize_gpio()
+
+        try:
+            pwm = PWM((self._step_pin,))
+            pwm.period = 1e6 * self._angular_speed_to_step_delay(speed)
+            pwm.set_pulse_length_in_micros(self._step_pin, pulse_time)
+
+            pwm.update()
+            time.sleep(seconds)
+            pwm.stop()
+
+        finally:
+            self._cleanup_gpio()
 
 
 class TMC2209(StepperMotorController):
