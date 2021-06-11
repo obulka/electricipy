@@ -10,6 +10,9 @@ pigpio = "*"
 
 [dev-packages]
 pylint = "*"
+simple-http-server = "*"
+sphinx = "*"
+rinohtype = "*"
 
 [requires]
 python_version = "3.7"
