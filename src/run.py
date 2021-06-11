@@ -23,11 +23,10 @@ def main():
         microsteps=microsteps,
     )
 
-    for _ in range(3):
-        motor.move_motor_at_speed_for_time(360.* 5, 1.)
-        # motor.move_motor_by_angle_in_time(180., 1.)
-        time.sleep(1)
-
+    start_time = time.time()
+    motor.move_at_speed_for_time(360, 60)
+    # motor.move_by_angle_in_time(360. * 60, 60)
+    print("--- %s seconds ---" % (time.time() - start_time))
 
 if __name__ == "__main__":
     main()

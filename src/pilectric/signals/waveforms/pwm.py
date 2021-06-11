@@ -39,7 +39,7 @@ class PWM(GPIOController):
     cycle time (0-1.0) or as the on time in microseconds.
     """
 
-    def __init__(self, pins, frequency=1000, pi_connection=None):
+    def __init__(self, pins, frequency=1e3, pi_connection=None):
         """ Instantiate the PWM.
 
         Args:
@@ -55,7 +55,7 @@ class PWM(GPIOController):
         super().__init__(pi_connection=pi_connection)
 
         self._frequency = frequency
-        self._period = 1000000 / frequency
+        self._period = 1e6 / frequency
 
         self._pins = {pin: [0., 0.] for pin in pins}
 
@@ -69,7 +69,7 @@ class PWM(GPIOController):
     @frequency.setter
     def frequency(self, new_frequency):
         self._frequency = float(new_frequency)
-        self._period = 1000000 / self._frequency
+        self._period = 1e6 / self._frequency
 
     @property
     def period(self):
@@ -79,7 +79,7 @@ class PWM(GPIOController):
     @period.setter
     def period(self, new_period):
         self._period = float(new_period)
-        self._frequency = 1000000 / self._period
+        self._frequency = 1e6 / self._period
 
     def _initialize_gpio(self):
         """ Initialize the GPIO pins. """
