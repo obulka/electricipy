@@ -1,4 +1,21 @@
-""" PWM Module """
+"""
+Copyright 2021 Owen Bulka
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+PWM Module
+"""
 # 3rd Party Imports
 import pigpio
 
@@ -24,19 +41,6 @@ class PWM(GPIOController):
     cycle                      cycle                      cycle
     start                      start                      start
 
-    The underlying PWM frequency is the same for all GPIO and
-    is the number of cycles per second (known as Hertz).
-
-    The frequency may be specified in Hertz or by specifying
-    the cycle time in microseconds (in which case a frequency
-    of 1000000 / cycle time is set).
-
-    The PWM duty cycle (the proportion of on time to cycle time)
-    and the start of the on time within each cycle may be set on
-    a GPIO by GPIO basis.
-
-    The GPIO PWM duty cycle may be set as a fraction of the
-    cycle time (0-1.0) or as the on time in microseconds.
     """
 
     def __init__(self, pins, frequency=1e3, pi_connection=None):
