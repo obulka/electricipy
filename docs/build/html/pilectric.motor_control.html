@@ -1,0 +1,317 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>pilectric.motor_control package &mdash; pilectric 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pilectric
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">pilectric.motor_control package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-pilectric.motor_control.stepper">pilectric.motor_control.stepper module</a></li>
+<li><a class="reference internal" href="#module-pilectric.motor_control">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pilectric</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>pilectric.motor_control package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/pilectric.motor_control.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pilectric-motor-control-package">
+<h1>pilectric.motor_control package<a class="headerlink" href="#pilectric-motor-control-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-pilectric.motor_control.stepper">
+<span id="pilectric-motor-control-stepper-module"></span><h2>pilectric.motor_control.stepper module<a class="headerlink" href="#module-pilectric.motor_control.stepper" title="Permalink to this headline">¶</a></h2>
+<p>This module contains stepper motor controls.</p>
+<dl class="class">
+<dt id="pilectric.motor_control.stepper.StepperMotorController">
+<em class="property">class </em><code class="descclassname">pilectric.motor_control.stepper.</code><code class="descname">StepperMotorController</code><span class="sig-paren">(</span><em>step_pin</em>, <em>direction_pin</em>, <em>microstep_pins=()</em>, <em>microsteps=1</em>, <em>pi_connection=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/motor_control/stepper.html#StepperMotorController"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pilectric.motor_control.stepper.StepperMotorController" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pilectric.html#pilectric.gpio_controller.GPIOController" title="pilectric.gpio_controller.GPIOController"><code class="xref py py-class docutils literal notranslate"><span class="pre">pilectric.gpio_controller.GPIOController</span></code></a></p>
+<p>Base class for control of stepper motors.</p>
+<dl class="attribute">
+<dt id="pilectric.motor_control.stepper.StepperMotorController.FULL_STEPS_PER_TURN">
+<code class="descname">FULL_STEPS_PER_TURN</code><em class="property"> = None</em><a class="headerlink" href="#pilectric.motor_control.stepper.StepperMotorController.FULL_STEPS_PER_TURN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pilectric.motor_control.stepper.StepperMotorController.MICROSTEPS">
+<code class="descname">MICROSTEPS</code><em class="property"> = {}</em><a class="headerlink" href="#pilectric.motor_control.stepper.StepperMotorController.MICROSTEPS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pilectric.motor_control.stepper.StepperMotorController.clockwise">
+<code class="descname">clockwise</code><a class="headerlink" href="#pilectric.motor_control.stepper.StepperMotorController.clockwise" title="Permalink to this definition">¶</a></dt>
+<dd><p>bool: True if motor set to rotate clockwise, False if
+counterclockwise.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pilectric.motor_control.stepper.StepperMotorController.microsteps">
+<code class="descname">microsteps</code><a class="headerlink" href="#pilectric.motor_control.stepper.StepperMotorController.microsteps" title="Permalink to this definition">¶</a></dt>
+<dd><p>int: The number of microsteps to take.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pilectric.motor_control.stepper.StepperMotorController.move_at_speed_for_time">
+<code class="descname">move_at_speed_for_time</code><span class="sig-paren">(</span><em>speed</em>, <em>seconds</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/motor_control/stepper.html#StepperMotorController.move_at_speed_for_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pilectric.motor_control.stepper.StepperMotorController.move_at_speed_for_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move the motor a number of degrees in a period of time.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>speed (float): Speed in degrees/second to move at.
+time (float): Time to move the motor for in seconds.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pilectric.motor_control.stepper.StepperMotorController.move_by_angle_at_speed">
+<code class="descname">move_by_angle_at_speed</code><span class="sig-paren">(</span><em>angle</em>, <em>speed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/motor_control/stepper.html#StepperMotorController.move_by_angle_at_speed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pilectric.motor_control.stepper.StepperMotorController.move_by_angle_at_speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move the motor a number of degrees at a speed.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>angle (float): Number of degrees to move.
+speed (float): Speed in degrees/second to move at.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pilectric.motor_control.stepper.StepperMotorController.move_by_angle_in_time">
+<code class="descname">move_by_angle_in_time</code><span class="sig-paren">(</span><em>angle</em>, <em>seconds</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/motor_control/stepper.html#StepperMotorController.move_by_angle_in_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pilectric.motor_control.stepper.StepperMotorController.move_by_angle_in_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move the motor a number of degrees in a period of time.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>angle (float): Number of degrees to move.
+time (float): Time in which to move the motor by degrees.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pilectric.motor_control.stepper.StepperMotorController.step">
+<code class="descname">step</code><span class="sig-paren">(</span><em>num_steps</em>, <em>step_delay=0.0005</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/motor_control/stepper.html#StepperMotorController.step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pilectric.motor_control.stepper.StepperMotorController.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Step the motor a number of times.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>num_steps (int): Number of steps to perform.</dd>
+<dt>Keyword Args:</dt>
+<dd><dl class="first last docutils">
+<dt>step_delay (float):</dt>
+<dd>The time for which the pulse is high. Therefore one step
+will take 2 * step_delay seconds.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pilectric.motor_control.stepper.TMC2209">
+<em class="property">class </em><code class="descclassname">pilectric.motor_control.stepper.</code><code class="descname">TMC2209</code><span class="sig-paren">(</span><em>step_pin</em>, <em>direction_pin</em>, <em>enable_pin</em>, <em>microstep_pins=()</em>, <em>microsteps=8</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/motor_control/stepper.html#TMC2209"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pilectric.motor_control.stepper.TMC2209" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pilectric.motor_control.stepper.StepperMotorController" title="pilectric.motor_control.stepper.StepperMotorController"><code class="xref py py-class docutils literal notranslate"><span class="pre">pilectric.motor_control.stepper.StepperMotorController</span></code></a></p>
+<p>Control a stepper motor using a TMC2209 v1.2 control board</p>
+<dl class="attribute">
+<dt id="pilectric.motor_control.stepper.TMC2209.FULL_STEPS_PER_TURN">
+<code class="descname">FULL_STEPS_PER_TURN</code><em class="property"> = 200</em><a class="headerlink" href="#pilectric.motor_control.stepper.TMC2209.FULL_STEPS_PER_TURN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pilectric.motor_control.stepper.TMC2209.MICROSTEPS">
+<code class="descname">MICROSTEPS</code><em class="property"> = {8: (False, False), 16: (True, True), 32: (False, True), 64: (True, False)}</em><a class="headerlink" href="#pilectric.motor_control.stepper.TMC2209.MICROSTEPS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pilectric.motor_control">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pilectric.motor_control" title="Permalink to this headline">¶</a></h2>
+<p>Module for controlling motors.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Owen Bulka.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

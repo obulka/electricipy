@@ -1,0 +1,483 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>pilectric.motor_control.stepper &mdash; pilectric 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> pilectric
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pilectric</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>pilectric.motor_control.stepper</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pilectric.motor_control.stepper</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; This module contains stepper motor controls. &quot;&quot;&quot;</span>
+<span class="c1"># Standard Imports</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="c1"># 3rd Party Imports</span>
+<span class="kn">import</span> <span class="nn">pigpio</span>
+
+<span class="c1"># Local Imports</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">GPIOController</span>
+
+
+<div class="viewcode-block" id="StepperMotorController"><a class="viewcode-back" href="../../../pilectric.motor_control.html#pilectric.motor_control.stepper.StepperMotorController">[docs]</a><span class="k">class</span> <span class="nc">StepperMotorController</span><span class="p">(</span><span class="n">GPIOController</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Base class for control of stepper motors. &quot;&quot;&quot;</span>
+
+    <span class="n">MICROSTEPS</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">FULL_STEPS_PER_TURN</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">step_pin</span><span class="p">,</span>
+            <span class="n">direction_pin</span><span class="p">,</span>
+            <span class="n">microstep_pins</span><span class="o">=</span><span class="p">(),</span>
+            <span class="n">microsteps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">pi_connection</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Stepper motor control class.</span>
+
+<span class="sd">        Note: Uses BCM mode for compatibility with pigpio.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step_pin (int): The step pin number to use.</span>
+<span class="sd">            direction_pin (int): The direction pin number to use.</span>
+
+<span class="sd">        Keyword Args:</span>
+<span class="sd">            microstep_pins (tuple(int,)):</span>
+<span class="sd">                The pin numbers for the microstep settings. (MS2, MS1)</span>
+<span class="sd">            microsteps (int):</span>
+<span class="sd">                The number of microsteps to perform. If you have hard</span>
+<span class="sd">                wired the microstep pins you must pass the number of</span>
+<span class="sd">                microsteps you have set it to in order for the</span>
+<span class="sd">                controller to operate correctly. The default 1 microstep</span>
+<span class="sd">                means the motor is taking full steps.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pi_connection</span><span class="o">=</span><span class="n">pi_connection</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_step_pin</span> <span class="o">=</span> <span class="n">step_pin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_direction_pin</span> <span class="o">=</span> <span class="n">direction_pin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_microstep_pins</span> <span class="o">=</span> <span class="n">microstep_pins</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_microsteps</span> <span class="o">=</span> <span class="n">microsteps</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stop</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clockwise</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wave_id</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">clockwise</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; bool: True if motor set to rotate clockwise, False if</span>
+<span class="sd">        counterclockwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clockwise</span>
+
+    <span class="nd">@clockwise</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">clockwise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rotate_clockwise</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clockwise</span> <span class="o">=</span> <span class="n">rotate_clockwise</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">microsteps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; int: The number of microsteps to take. &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_microsteps</span>
+
+    <span class="nd">@microsteps</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">microsteps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">microsteps</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_microstep_value</span><span class="p">(</span><span class="n">microsteps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_microsteps</span> <span class="o">=</span> <span class="n">microsteps</span>
+
+    <span class="k">def</span> <span class="nf">_check_microstep_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">microsteps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Check if a number of microsteps is a valid option.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the number of microsteps is invalid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">microsteps</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">MICROSTEPS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="n">f</span><span class="s2">&quot;Invalid number of microsteps: </span><span class="si">{microsteps}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="n">f</span><span class="s2">&quot;Valid options are {self.MICROSTEPS.keys()}&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_initialize_gpio</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initialize the GPIO pins. &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pi</span><span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_step_pin</span><span class="p">,</span> <span class="n">pigpio</span><span class="o">.</span><span class="n">OUTPUT</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pi</span><span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_direction_pin</span><span class="p">,</span> <span class="n">pigpio</span><span class="o">.</span><span class="n">OUTPUT</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_direction_pin</span><span class="p">,</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clockwise</span><span class="p">)</span>
+
+        <span class="n">microstep_pin_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MICROSTEPS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_microsteps</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">pin</span><span class="p">,</span> <span class="n">pin_value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_microstep_pins</span><span class="p">,</span> <span class="n">microstep_pin_values</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pi</span><span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="n">pin</span><span class="p">,</span> <span class="n">pigpio</span><span class="o">.</span><span class="n">OUTPUT</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pin</span><span class="p">,</span> <span class="n">pin_value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_cleanup_gpio</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Reset all pins to low to cleanup. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wave_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pi</span><span class="o">.</span><span class="n">wave_delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wave_id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wave_id</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_step_pin</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_direction_pin</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">pin</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_microstep_pins</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pin</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+<div class="viewcode-block" id="StepperMotorController.step"><a class="viewcode-back" href="../../../pilectric.motor_control.html#pilectric.motor_control.stepper.StepperMotorController.step">[docs]</a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">,</span> <span class="n">step_delay</span><span class="o">=</span><span class="mf">5e-4</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Step the motor a number of times.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            num_steps (int): Number of steps to perform.</span>
+
+<span class="sd">        Keyword Args:</span>
+<span class="sd">            step_delay (float):</span>
+<span class="sd">                The time for which the pulse is high. Therefore one step</span>
+<span class="sd">                will take 2 * step_delay seconds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">microsecond_step_delay</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mf">1e6</span> <span class="o">*</span> <span class="n">step_delay</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pi</span><span class="o">.</span><span class="n">wave_add_generic</span><span class="p">([</span>
+                <span class="n">pigpio</span><span class="o">.</span><span class="n">pulse</span><span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step_pin</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">microsecond_step_delay</span><span class="p">),</span>
+                <span class="n">pigpio</span><span class="o">.</span><span class="n">pulse</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step_pin</span><span class="p">,</span> <span class="n">microsecond_step_delay</span><span class="p">),</span>
+            <span class="p">])</span>
+
+            <span class="n">wave_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pi</span><span class="o">.</span><span class="n">wave_create</span><span class="p">()</span>
+
+            <span class="n">full_loop_denominator</span> <span class="o">=</span> <span class="mi">256</span> <span class="o">*</span> <span class="mi">255</span> <span class="o">+</span> <span class="mi">255</span>
+            <span class="n">num_full_loops</span> <span class="o">=</span> <span class="n">num_steps</span> <span class="o">//</span> <span class="n">full_loop_denominator</span>
+            <span class="n">full_loop_remainder</span> <span class="o">=</span> <span class="n">num_steps</span> <span class="o">%</span> <span class="n">full_loop_denominator</span>
+
+            <span class="n">final_multiple</span> <span class="o">=</span> <span class="n">full_loop_remainder</span> <span class="o">//</span> <span class="mi">256</span>
+            <span class="n">final_remainder</span> <span class="o">=</span> <span class="n">full_loop_remainder</span> <span class="o">%</span> <span class="mi">256</span>
+
+            <span class="n">wave_chain</span> <span class="o">=</span> <span class="p">[</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">wave_id</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_full_loops</span>
+            <span class="n">wave_chain</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+                <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>                          <span class="c1"># Start loop</span>
+                <span class="n">wave_id</span><span class="p">,</span>                         <span class="c1"># Create wave</span>
+                <span class="mi">255</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>                          <span class="c1"># loop end</span>
+                <span class="n">final_remainder</span><span class="p">,</span> <span class="n">final_multiple</span><span class="p">,</span> <span class="c1"># repeat step_remainder + 256 * step_multiple</span>
+            <span class="p">])</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pi</span><span class="o">.</span><span class="n">wave_chain</span><span class="p">(</span><span class="n">wave_chain</span><span class="p">)</span>
+
+            <span class="c1"># Wait for wave to finish transmission</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pi</span><span class="o">.</span><span class="n">wave_tx_busy</span><span class="p">():</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stop</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_angle_to_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Convert a number of degrees to the closest number of steps.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            angle (float): The number of degrees.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The equivalent number of steps.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FULL_STEPS_PER_TURN</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_microsteps</span> <span class="o">*</span> <span class="n">angle</span> <span class="o">/</span> <span class="mf">360.</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_angular_speed_to_step_speed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">speed</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Convert a speed in degrees/second to steps/second.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            speed (float): The speed in degrees/second.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The equivalent speed in steps/second.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">FULL_STEPS_PER_TURN</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_microsteps</span> <span class="o">*</span> <span class="n">speed</span> <span class="o">/</span> <span class="mf">360.</span>
+
+    <span class="k">def</span> <span class="nf">_angular_speed_to_step_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">speed</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Convert a speed in degrees/second to the step delay</span>
+<span class="sd">        (half pulse period).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            speed (float): The speed in degrees/second.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The equivalent pulse time in seconds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_angular_speed_to_step_speed</span><span class="p">(</span><span class="n">speed</span><span class="p">))</span>
+
+<div class="viewcode-block" id="StepperMotorController.move_by_angle_at_speed"><a class="viewcode-back" href="../../../pilectric.motor_control.html#pilectric.motor_control.stepper.StepperMotorController.move_by_angle_at_speed">[docs]</a>    <span class="k">def</span> <span class="nf">move_by_angle_at_speed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">speed</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Move the motor a number of degrees at a speed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            angle (float): Number of degrees to move.</span>
+<span class="sd">            speed (float): Speed in degrees/second to move at.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_angle_to_steps</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+        <span class="n">step_delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_angular_speed_to_step_delay</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="n">step_delay</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StepperMotorController.move_by_angle_in_time"><a class="viewcode-back" href="../../../pilectric.motor_control.html#pilectric.motor_control.stepper.StepperMotorController.move_by_angle_in_time">[docs]</a>    <span class="k">def</span> <span class="nf">move_by_angle_in_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">seconds</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Move the motor a number of degrees in a period of time.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            angle (float): Number of degrees to move.</span>
+<span class="sd">            time (float): Time in which to move the motor by degrees.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_by_angle_at_speed</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">angle</span> <span class="o">/</span> <span class="n">seconds</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StepperMotorController.move_at_speed_for_time"><a class="viewcode-back" href="../../../pilectric.motor_control.html#pilectric.motor_control.stepper.StepperMotorController.move_at_speed_for_time">[docs]</a>    <span class="k">def</span> <span class="nf">move_at_speed_for_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span> <span class="n">seconds</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Move the motor a number of degrees in a period of time.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            speed (float): Speed in degrees/second to move at.</span>
+<span class="sd">            time (float): Time to move the motor for in seconds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_by_angle_at_speed</span><span class="p">(</span><span class="n">speed</span> <span class="o">*</span> <span class="n">seconds</span><span class="p">,</span> <span class="n">speed</span><span class="p">)</span></div></div>
+
+
+
+<div class="viewcode-block" id="TMC2209"><a class="viewcode-back" href="../../../pilectric.motor_control.html#pilectric.motor_control.stepper.TMC2209">[docs]</a><span class="k">class</span> <span class="nc">TMC2209</span><span class="p">(</span><span class="n">StepperMotorController</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Control a stepper motor using a TMC2209 v1.2 control board &quot;&quot;&quot;</span>
+
+    <span class="n">MICROSTEPS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">8</span><span class="p">:</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="mi">32</span><span class="p">:</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+        <span class="mi">64</span><span class="p">:</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="mi">16</span><span class="p">:</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="n">FULL_STEPS_PER_TURN</span> <span class="o">=</span> <span class="mi">200</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">step_pin</span><span class="p">,</span>
+            <span class="n">direction_pin</span><span class="p">,</span>
+            <span class="n">enable_pin</span><span class="p">,</span>
+            <span class="n">microstep_pins</span><span class="o">=</span><span class="p">(),</span>
+            <span class="n">microsteps</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initialize the pin locations.</span>
+
+<span class="sd">        Note: Uses BOARD mode for compatibility with more Pi versions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            step_pin (int): The step pin number to use. (STEP)</span>
+<span class="sd">            direction_pin (int): The direction pin number to use. (DIR)</span>
+<span class="sd">            enable_pin (int): The enable pin number to use. (EN)</span>
+
+<span class="sd">        Keyword Args:</span>
+<span class="sd">            microstep_pins (tuple(int, int)):</span>
+<span class="sd">                The pin numbers for the microstep settings. (MS2, MS1)</span>
+<span class="sd">            microsteps (int):</span>
+<span class="sd">                The number of microsteps to perform. If you have hard</span>
+<span class="sd">                wired the microstep pins you must pass the number of</span>
+<span class="sd">                microsteps you have set it to in order for the</span>
+<span class="sd">                controller to operate correctly.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If too many microstep pins are passed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">microstep_pins</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Too many microstep pins specified, there are only two.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_microstep_value</span><span class="p">(</span><span class="n">microsteps</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">step_pin</span><span class="p">,</span>
+            <span class="n">direction_pin</span><span class="p">,</span>
+            <span class="n">microstep_pins</span><span class="o">=</span><span class="n">microstep_pins</span><span class="p">,</span>
+            <span class="n">microsteps</span><span class="o">=</span><span class="n">microsteps</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_enable_pin</span> <span class="o">=</span> <span class="n">enable_pin</span>
+
+    <span class="k">def</span> <span class="nf">_initialize_gpio</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_initialize_gpio</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pi</span><span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_enable_pin</span><span class="p">,</span> <span class="n">pigpio</span><span class="o">.</span><span class="n">OUTPUT</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_enable_pin</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_cleanup_gpio</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_cleanup_gpio</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_enable_pin</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Owen Bulka.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
