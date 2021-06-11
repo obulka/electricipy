@@ -30,17 +30,23 @@ class GPIOController:
         self._initialize_gpio()
         self._stop = False
 
-    def __exit__(self, type, value, traceback):
-        """ Exit the routine. """
+    def __exit__(self, exception_type, exception_value, exception_traceback):
+        """ Exit the routine.
+
+        Args:
+            exception_type (Exception): Indicates class of exception.
+            exception_value (str): Indicates the type of exception.
+            exception_traceback (traceback):
+                Report which has all of the information needed to solve
+                the exception.
+        """
         self._cleanup_gpio()
 
     def _initialize_gpio(self):
         """ Initialize the GPIO pins. """
-        pass
 
     def _cleanup_gpio(self):
         """ Reset all pins to cleanup. """
-        pass
 
     def stop(self):
         """ Stops the current routine immediately. """

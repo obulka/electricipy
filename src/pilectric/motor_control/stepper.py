@@ -8,7 +8,7 @@ import time
 import RPi.GPIO as GPIO
 
 # Local Imports
-from ..gpio_controller import GPIOController
+from .. import GPIOController
 from ..signals.waveforms.pwm import PWM
 
 

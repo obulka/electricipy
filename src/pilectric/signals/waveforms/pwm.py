@@ -3,7 +3,7 @@
 import pigpio
 
 # Local Imports
-from pilectric.gpio_controller import GPIOController
+from pilectric import GPIOController
 
 
 class PWM(GPIOController):
