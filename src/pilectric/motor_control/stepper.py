@@ -1,6 +1,4 @@
 """ This module contains stepper motor controls. """
-# pylint: disable=no-member
-
 # Standard Imports
 import time
 
@@ -9,7 +7,6 @@ import pigpio
 
 # Local Imports
 from .. import GPIOController
-from ..signals.waveforms.pwm import PWM
 
 
 class StepperMotorController(GPIOController):
@@ -130,7 +127,7 @@ class StepperMotorController(GPIOController):
                 pigpio.pulse(0, 1 << self._step_pin, microsecond_step_delay),
             ])
 
-            wave_id = self._pi.wave_create();
+            wave_id = self._pi.wave_create()
 
             full_loop_denominator = 256 * 255 + 255
             num_full_loops = num_steps // full_loop_denominator
