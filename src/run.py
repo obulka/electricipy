@@ -24,7 +24,7 @@ def main():
     )
 
     for _ in range(3):
-        motor.move_motor_at_speed_for_time(360.* .5, 1.)
+        motor.move_motor_at_speed_for_time(360.* 5, 1.)
         # motor.move_motor_by_angle_in_time(180., 1.)
         time.sleep(1)
 

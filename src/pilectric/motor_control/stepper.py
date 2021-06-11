@@ -8,15 +8,23 @@ import time
 import RPi.GPIO as GPIO
 
 # Local Imports
+from ..gpio_controller import GPIOController
 from ..signals.waveforms.pwm import PWM
 
-class StepperMotorController:
+
+class StepperMotorController(GPIOController):
     """ Base class for control of stepper motors. """
 
     MICROSTEPS = {}
     FULL_STEPS_PER_TURN = None
 
-    def __init__(self, step_pin, direction_pin, microstep_pins=(), microsteps=1):
+    def __init__(
+            self,
+            step_pin,
+            direction_pin,
+            microstep_pins=(),
+            microsteps=1,
+            pi_connection=None):
         """ Stepper motor control class.
 
         Note: Uses BCM mode for compatibility with pigpio.
@@ -35,8 +43,7 @@ class StepperMotorController:
                 controller to operate correctly. The default 1 microstep
                 means the motor is taking full steps.
         """
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setwarnings(False)
+        super().__init__(pi_connection=pi_connection)
 
         self._step_pin = step_pin
         self._direction_pin = direction_pin
@@ -44,7 +51,7 @@ class StepperMotorController:
 
         self._microsteps = microsteps
 
-        self._stop_motor = False
+        self._stop = False
         self._clockwise = True
 
     @property
@@ -82,28 +89,24 @@ class StepperMotorController:
 
     def _initialize_gpio(self):
         """ Initialize the GPIO pins. """
-        GPIO.setup(self._step_pin, GPIO.OUT)
-        GPIO.setup(self._direction_pin, GPIO.OUT)
-        GPIO.output(self._direction_pin, not self._clockwise)
+        self._pi.set_mode(self._step_pin, GPIO.OUT)
+        self._pi.set_mode(self._direction_pin, GPIO.OUT)
+        self._pi.write(self._direction_pin, not self._clockwise)
 
         microstep_pin_values = self.MICROSTEPS[self._microsteps]
         for pin, pin_value in zip(self._microstep_pins, microstep_pin_values):
-            GPIO.setup(pin, GPIO.OUT)
-            GPIO.output(pin, pin_value)
+            self._pi.set_mode(pin, GPIO.OUT)
+            self._pi.write(pin, pin_value)
 
     def _cleanup_gpio(self):
         """ Reset all pins to low to cleanup. """
-        GPIO.output(self._step_pin, False)
-        GPIO.output(self._direction_pin, False)
+        self._pi.write(self._step_pin, False)
+        self._pi.write(self._direction_pin, False)
 
         for pin in self._microstep_pins:
-            GPIO.output(pin, False)
+            self._pi.write(pin, False)
 
-    def stop(self):
-        """ Stops the current motor routine immediately. """
-        self._stop_motor = True
-
-    def step_motor(self, num_steps, step_delay=5e-4):
+    def step(self, num_steps, step_delay=5e-4):
         """ Step the motor a number of times.
 
         Note that this method guarantees the correct number of steps but
@@ -118,23 +121,16 @@ class StepperMotorController:
                 The time for which the pulse is high. Therefore one step
                 will take 2 * step_delay seconds.
         """
-        self._stop_motor = False
-
-        self._initialize_gpio()
-
-        try:
+        with self:
             for _ in range(num_steps):
-                if self._stop_motor:
+                if self._stop:
                     return
 
-                GPIO.output(self._step_pin, True)
+                self._pi.write(self._step_pin, True)
                 time.sleep(step_delay)
 
-                GPIO.output(self._step_pin, False)
+                self._pi.write(self._step_pin, False)
                 time.sleep(step_delay)
-
-        finally:
-            self._cleanup_gpio()
 
     def _angle_to_steps(self, angle):
         """ Convert a number of degrees to the closest number of steps.
@@ -183,8 +179,6 @@ class StepperMotorController:
         """
         steps = self._angle_to_steps(angle)
         step_delay = self._angular_speed_to_step_delay(speed)
-        print("Steps:", steps)
-        print("Step delay:", step_delay)
 
         self.step_motor(steps, step_delay)
 
@@ -201,7 +195,7 @@ class StepperMotorController:
         """
         self.move_motor_by_angle_at_speed(angle, angle / seconds)
 
-    def move_motor_at_speed_for_time(self, speed, seconds, pulse_time=1):
+    def move_motor_at_speed_for_time(self, speed, seconds, duty_cycle=0.25):
         """ Move the motor a number of degrees in a period of time.
 
         Note that this method guarantees the correct speed but
@@ -219,21 +213,14 @@ class StepperMotorController:
                 Time the step pulse is high in microseconds. May not
                 work lower than 1.
         """
-        self._stop_motor = False
-
-        self._initialize_gpio()
-
-        try:
+        with self:
             pwm = PWM((self._step_pin,))
             pwm.period = 1e6 * self._angular_speed_to_step_delay(speed)
-            pwm.set_pulse_length_in_micros(self._step_pin, pulse_time)
+            pwm.set_duty_cycle(self._step_pin, duty_cycle)
 
             pwm.update()
             time.sleep(seconds)
             pwm.stop()
-
-        finally:
-            self._cleanup_gpio()
 
 
 class TMC2209(StepperMotorController):
@@ -272,6 +259,9 @@ class TMC2209(StepperMotorController):
                 wired the microstep pins you must pass the number of
                 microsteps you have set it to in order for the
                 controller to operate correctly.
+
+        Raises:
+            ValueError: If too many microstep pins are passed.
         """
         if len(microstep_pins) > 2:
             raise ValueError(
@@ -292,10 +282,10 @@ class TMC2209(StepperMotorController):
     def _initialize_gpio(self):
         super()._initialize_gpio()
 
-        GPIO.setup(self._enable_pin, GPIO.OUT)
-        GPIO.output(self._enable_pin, False)
+        self._pi.set_mode(self._enable_pin, GPIO.OUT)
+        self._pi.write(self._enable_pin, False)
 
     def _cleanup_gpio(self):
         super()._cleanup_gpio()
 
-        GPIO.output(self._enable_pin, True)
+        self._pi.write(self._enable_pin, True)
