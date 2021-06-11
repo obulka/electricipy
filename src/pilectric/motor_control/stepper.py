@@ -148,15 +148,27 @@ class StepperMotorController(GPIOController):
 
             full_loop_denominator = 256 * 255 + 255
             num_full_loops = num_steps // full_loop_denominator
+
+            if num_full_loops > full_loop_denominator:
+                raise ValueError("Too many steps for waveform, on the TODO list.")
+
             full_loop_remainder = num_steps % full_loop_denominator
 
             final_multiple = full_loop_remainder // 256
             final_remainder = full_loop_remainder % 256
 
-            wave_chain = [255, 0, wave_id, 255, 1, 255, 255] * num_full_loops
+            wave_chain = [
+                255, 0,
+                    255, 0,
+                        wave_id,
+                    255, 1,
+                    255, 255,
+                255, 1,
+                num_full_loops % 256, num_full_loops // 256,
+            ]
             wave_chain.extend([
                 255, 0,                          # Start loop
-                wave_id,                         # Create wave
+                    wave_id,                     # Create wave
                 255, 1,                          # loop end
                 final_remainder, final_multiple, # repeat step_remainder + 256 * step_multiple
             ])
