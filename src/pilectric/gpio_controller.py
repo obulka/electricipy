@@ -27,10 +27,9 @@ class GPIOController:
         """ Initialize the controller.
 
         Keyword Args:
-            pi_connection (pigpio.pi):
-                The connection to the raspberry pi. If not specified, we
-                assume the code is running on a pi and use the local
-                gpio.
+            pi_connection (pigpio.pi): The connection to the raspberry
+                pi. If not specified, we assume the code is running on a
+                pi and use the local gpio.
 
         Raises:
             ValueError:
@@ -53,9 +52,8 @@ class GPIOController:
         Args:
             exception_type (Exception): Indicates class of exception.
             exception_value (str): Indicates the type of exception.
-            exception_traceback (traceback):
-                Report which has all of the information needed to solve
-                the exception.
+            exception_traceback (traceback): Report which has all of the
+                information needed to solve the exception.
         """
         self._cleanup_gpio()
 

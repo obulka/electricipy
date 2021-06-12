@@ -13,6 +13,7 @@ pylint = "*"
 simple-http-server = "*"
 sphinx = "*"
 rinohtype = "*"
+sphinx-rtd-theme = "*"
 
 [requires]
 python_version = "3.7"

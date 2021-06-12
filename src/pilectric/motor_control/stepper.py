@@ -48,14 +48,14 @@ class StepperMotorController(GPIOController):
             direction_pin (int): The direction pin number to use.
 
         Keyword Args:
-            microstep_pins (tuple(int,)):
-                The pin numbers for the microstep settings. (MS2, MS1)
+            microstep_pins (tuple(int,)): The pin numbers for the
+                microstep settings. (MS2, MS1)
             microsteps (int):
                 The number of microsteps to perform. If you have hard
                 wired the microstep pins you must pass the number of
-                microsteps you have set it to in order for the
-                controller to operate correctly. The default 1 microstep
-                means the motor is taking full steps.
+                microsteps you have set it to in order for thecontroller
+                to operate correctly. The default 1 microstep means the
+                motor is taking full steps.
         """
         super().__init__(pi_connection=pi_connection)
 
@@ -132,9 +132,8 @@ class StepperMotorController(GPIOController):
             num_steps (int): Number of steps to perform.
 
         Keyword Args:
-            step_delay (float):
-                The time for which the pulse is high. Therefore one step
-                will take 2 * step_delay seconds.
+            step_delay (float): The time for which the pulse is high.
+                Therefore one step will take 2 * step_delay seconds.
         """
         with self:
             microsecond_step_delay = round(1e6 * step_delay)
@@ -281,8 +280,9 @@ class TMC2209(StepperMotorController):
             microsteps (int):
                 The number of microsteps to perform. If you have hard
                 wired the microstep pins you must pass the number of
-                microsteps you have set it to in order for the
-                controller to operate correctly.
+                microsteps you have set it to in order for thecontroller
+                to operate correctly. The default 1 microstep means the
+                motor is taking full steps.
 
         Raises:
             ValueError: If too many microstep pins are passed.
@@ -304,12 +304,14 @@ class TMC2209(StepperMotorController):
         self._enable_pin = enable_pin
 
     def _initialize_gpio(self):
+        """ Initialize the GPIO pins. """
         super()._initialize_gpio()
 
         self._pi.set_mode(self._enable_pin, pigpio.OUTPUT)
         self._pi.write(self._enable_pin, False)
 
     def _cleanup_gpio(self):
+        """ Reset all pins to low to cleanup. """
         super()._cleanup_gpio()
 
         self._pi.write(self._enable_pin, True)

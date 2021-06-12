@@ -26,21 +26,6 @@ from pilectric import GPIOController
 class PWM(GPIOController):
     """ This class may be used to generate PWM on multiple GPIO
     at the same time.
-
-    The following diagram illustrates PWM for one GPIO.
-
-    1        +------------+             +------------+
-             |    GPIO    |             |    GPIO    |
-             |<--- on --->|             |<--- on --->|
-             |    time    |             |    time    |
-    0   -----+            +-------------+            +---------
-           on^         off^           on^         off^
-      +--------------------------+--------------------------+
-      ^                          ^                          ^
-      |<------ cycle time ------>|<------ cycle time ------>|
-    cycle                      cycle                      cycle
-    start                      start                      start
-
     """
 
     def __init__(self, pins, frequency=1e3, pi_connection=None):
@@ -51,10 +36,9 @@ class PWM(GPIOController):
 
         Keyword Args:
             frequency (float): The frequency.
-            pi_connection (pigpio.pi):
-                The connection to the raspberry pi. If not specified, we
-                assume the code is running on a pi and use the local
-                gpio.
+            pi_connection (pigpio.pi): The connection to the raspberry
+                pi. If not specified, we assume the code is running on a
+                pi and use the local gpio.
         """
         super().__init__(pi_connection=pi_connection)
 
@@ -122,9 +106,8 @@ class PWM(GPIOController):
 
         Args:
             pin (int): The pin to set the duty cycle for.
-            percent (float):
-                The percentage of the period that the pulse will be
-                high.
+            percent (float): The percentage of the period that the pulse
+                will be high.
         """
         self.set_pulse_length_in_micros(pin, self._period * percent)
 
@@ -155,9 +138,8 @@ class PWM(GPIOController):
 
         Args:
             pin (int): The pin to set the pulse start for.
-            percent (float):
-                The percentage of the way into the period that the pulse
-                will go high.
+            percent (float): The percentage of the way into the period
+                that the pulse will go high.
         """
         self.set_pulse_start_in_micros(pin, self._period * percent)
 
@@ -168,12 +150,11 @@ class PWM(GPIOController):
             pin (int): The pin number to get the settings of.
 
         Returns:
-            float:
-                The pulse start in microseconds for the given pin,
-                or None if the pin is not used.
-            float:
-                The pulse length in microseconds for the given pin,
-                or None if the pin is not used.
+            tuple(float, float):
+                The pulse start in microseconds for the given pin, or
+                None if the pin is not used. The pulse length in
+                microseconds for the given pin, or None if the pin is
+                not used.
         """
         return self._pins.get(pin, [None, None])
 

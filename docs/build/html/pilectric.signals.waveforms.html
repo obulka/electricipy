@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html4" lang="en" >
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
   
@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,16 +31,18 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="run module" href="run.html" />
+    <link rel="prev" title="pilectric.signals package" href="pilectric.signals.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -83,16 +87,25 @@
               
             
             
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">pilectric.signals.waveforms package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-pilectric.signals.waveforms.pwm">pilectric.signals.waveforms.pwm module</a></li>
-<li><a class="reference internal" href="#module-pilectric.signals.waveforms">Module contents</a></li>
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="pilectric.html">pilectric package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="pilectric.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pilectric.motor_control.html">pilectric.motor_control package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="pilectric.signals.html">pilectric.signals package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pilectric.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pilectric.html#module-pilectric.gpio_controller">pilectric.gpio_controller module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pilectric.html#module-pilectric">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="run.html">run module</a></li>
 </ul>
 </li>
 </ul>
-</div>
+
             
           
         </div>
@@ -139,6 +152,12 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
+          <li><a href="modules.html">src</a> &raquo;</li>
+        
+          <li><a href="pilectric.html">pilectric package</a> &raquo;</li>
+        
+          <li><a href="pilectric.signals.html">pilectric.signals package</a> &raquo;</li>
+        
       <li>pilectric.signals.waveforms package</li>
     
     
@@ -165,150 +184,144 @@
 </div>
 <div class="section" id="module-pilectric.signals.waveforms.pwm">
 <span id="pilectric-signals-waveforms-pwm-module"></span><h2>pilectric.signals.waveforms.pwm module<a class="headerlink" href="#module-pilectric.signals.waveforms.pwm" title="Permalink to this headline">¶</a></h2>
+<p>Copyright 2021 Owen Bulka</p>
+<p>Licensed under the Apache License, Version 2.0 (the “License”);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<blockquote>
+<div><p><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+</div></blockquote>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an “AS IS” BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
 <p>PWM Module</p>
-<dl class="class">
-<dt id="pilectric.signals.waveforms.pwm.PWM">
-<em class="property">class </em><code class="descclassname">pilectric.signals.waveforms.pwm.</code><code class="descname">PWM</code><span class="sig-paren">(</span><em>pins</em>, <em>frequency=1000.0</em>, <em>pi_connection=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/signals/waveforms/pwm.html#PWM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pilectric.signals.waveforms.pwm.PWM" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="pilectric.signals.waveforms.pwm.PWM">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pilectric.signals.waveforms.pwm.</span></span><span class="sig-name descname"><span class="pre">PWM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pins</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pi_connection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/signals/waveforms/pwm.html#PWM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pilectric.signals.waveforms.pwm.PWM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="pilectric.html#pilectric.gpio_controller.GPIOController" title="pilectric.gpio_controller.GPIOController"><code class="xref py py-class docutils literal notranslate"><span class="pre">pilectric.gpio_controller.GPIOController</span></code></a></p>
 <p>This class may be used to generate PWM on multiple GPIO
 at the same time.</p>
-<p>The following diagram illustrates PWM for one GPIO.</p>
-<dl class="docutils">
-<dt>1        +————+             +————+</dt>
-<dd><div class="first line-block">
-<div class="line">GPIO    |             |    GPIO    |</div>
-</div>
-<p class="last"><a href="#id1"><span class="problematic" id="id2">|&lt;--- on ---&gt;|</span></a>             <a href="#id3"><span class="problematic" id="id4">|&lt;--- on ---&gt;|</span></a>
-|    time    |             |    time    |</p>
-</dd>
-<dt>0   —–+            +————-+            +———</dt>
-<dd><blockquote class="first">
-<div>on^         off^           on^         off^</div></blockquote>
-<table border="1" class="docutils">
-<tbody valign="top">
-</tbody>
-</table>
-<p class="last">^                          ^                          ^
-<a href="#id5"><span class="problematic" id="id6">|&lt;------ cycle time ------&gt;|&lt;------ cycle time ------&gt;|</span></a></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="pilectric.signals.waveforms.pwm.PWM.frequency">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">frequency</span></span><a class="headerlink" href="#pilectric.signals.waveforms.pwm.PWM.frequency" title="Permalink to this definition">¶</a></dt>
+<dd><p>PWM frequency in Hertz.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
 </dd>
 </dl>
-<p>cycle                      cycle                      cycle
-start                      start                      start</p>
-<p>The underlying PWM frequency is the same for all GPIO and
-is the number of cycles per second (known as Hertz).</p>
-<p>The frequency may be specified in Hertz or by specifying
-the cycle time in microseconds (in which case a frequency
-of 1000000 / cycle time is set).</p>
-<p>The PWM duty cycle (the proportion of on time to cycle time)
-and the start of the on time within each cycle may be set on
-a GPIO by GPIO basis.</p>
-<p>The GPIO PWM duty cycle may be set as a fraction of the
-cycle time (0-1.0) or as the on time in microseconds.</p>
-<dl class="attribute">
-<dt id="pilectric.signals.waveforms.pwm.PWM.frequency">
-<code class="descname">frequency</code><a class="headerlink" href="#pilectric.signals.waveforms.pwm.PWM.frequency" title="Permalink to this definition">¶</a></dt>
-<dd><p>float: PWM frequency in Hertz.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="pilectric.signals.waveforms.pwm.PWM.get_pin_settings">
-<code class="descname">get_pin_settings</code><span class="sig-paren">(</span><em>pin</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/signals/waveforms/pwm.html#PWM.get_pin_settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pilectric.signals.waveforms.pwm.PWM.get_pin_settings" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pilectric.signals.waveforms.pwm.PWM.get_pin_settings">
+<span class="sig-name descname"><span class="pre">get_pin_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/signals/waveforms/pwm.html#PWM.get_pin_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pilectric.signals.waveforms.pwm.PWM.get_pin_settings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the current PWM settings for a GPIO pin.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>pin (int): The pin number to get the settings of.</dd>
-<dt>Returns:</dt>
-<dd><dl class="first last docutils">
-<dt>float:</dt>
-<dd>The pulse start in microseconds for the given pin,
-or None if the pin is not used.</dd>
-<dt>float:</dt>
-<dd>The pulse length in microseconds for the given pin,
-or None if the pin is not used.</dd>
-</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The pin number to get the settings of.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The pulse start in microseconds for the given pin, or
+None if the pin is not used. The pulse length in
+microseconds for the given pin, or None if the pin is
+not used.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a>)</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="pilectric.signals.waveforms.pwm.PWM.period">
-<code class="descname">period</code><a class="headerlink" href="#pilectric.signals.waveforms.pwm.PWM.period" title="Permalink to this definition">¶</a></dt>
-<dd><p>float: PWM period in microseconds.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="pilectric.signals.waveforms.pwm.PWM.period">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">period</span></span><a class="headerlink" href="#pilectric.signals.waveforms.pwm.PWM.period" title="Permalink to this definition">¶</a></dt>
+<dd><p>PWM period in microseconds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="pilectric.signals.waveforms.pwm.PWM.set_duty_cycle">
-<code class="descname">set_duty_cycle</code><span class="sig-paren">(</span><em>pin</em>, <em>percent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/signals/waveforms/pwm.html#PWM.set_duty_cycle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pilectric.signals.waveforms.pwm.PWM.set_duty_cycle" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pilectric.signals.waveforms.pwm.PWM.set_duty_cycle">
+<span class="sig-name descname"><span class="pre">set_duty_cycle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/signals/waveforms/pwm.html#PWM.set_duty_cycle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pilectric.signals.waveforms.pwm.PWM.set_duty_cycle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the GPIO on for length fraction of each cycle. The
 GPIO will be on for (period * percent) microseconds per cycle.</p>
 <p>The change takes affect when the update function is called.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">pin (int): The pin to set the duty cycle for.
-percent (float):</p>
-<blockquote class="last">
-<div>The percentage of the period that the pulse will be
-high.</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The pin to set the duty cycle for.</p></li>
+<li><p><strong>percent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – The percentage of the period that the pulse
+will be high.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="pilectric.signals.waveforms.pwm.PWM.set_pulse_length_in_micros">
-<code class="descname">set_pulse_length_in_micros</code><span class="sig-paren">(</span><em>pin</em>, <em>pulse_length</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/signals/waveforms/pwm.html#PWM.set_pulse_length_in_micros"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pilectric.signals.waveforms.pwm.PWM.set_pulse_length_in_micros" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pilectric.signals.waveforms.pwm.PWM.set_pulse_length_in_micros">
+<span class="sig-name descname"><span class="pre">set_pulse_length_in_micros</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pulse_length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/signals/waveforms/pwm.html#PWM.set_pulse_length_in_micros"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pilectric.signals.waveforms.pwm.PWM.set_pulse_length_in_micros" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the GPIO on for pulse_length microseconds per cycle.
 The PWM duty cycle for the GPIO will be
 (pulse_length / period in micros) per cycle.</p>
 <p>The change takes effect when the update function is called.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>pin (int): The pin to set the pulse length for.
-pulse_length (float): The pulse length in microseconds.</dd>
-<dt>Raises:</dt>
-<dd>ValueError: If the pulse length is longer than the period.</dd>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The pin to set the pulse length for.</p></li>
+<li><p><strong>pulse_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – The pulse length in microseconds.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If the pulse length is longer than the period.</p>
+</dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="pilectric.signals.waveforms.pwm.PWM.set_pulse_start_in_micros">
-<code class="descname">set_pulse_start_in_micros</code><span class="sig-paren">(</span><em>pin</em>, <em>pulse_start</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/signals/waveforms/pwm.html#PWM.set_pulse_start_in_micros"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pilectric.signals.waveforms.pwm.PWM.set_pulse_start_in_micros" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pilectric.signals.waveforms.pwm.PWM.set_pulse_start_in_micros">
+<span class="sig-name descname"><span class="pre">set_pulse_start_in_micros</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pulse_start</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/signals/waveforms/pwm.html#PWM.set_pulse_start_in_micros"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pilectric.signals.waveforms.pwm.PWM.set_pulse_start_in_micros" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the GPIO high at start micros into each cycle.</p>
 <p>The change takes affect when the update function is called.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">pin (int): The pin to set the pulse start for.
-pulse_start (float):</p>
-<blockquote class="last">
-<div>The time into the cycle to begin the pulse.</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The pin to set the pulse start for.</p></li>
+<li><p><strong>pulse_start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – The time into the cycle to begin the pulse.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="pilectric.signals.waveforms.pwm.PWM.set_pulse_start_in_percentage">
-<code class="descname">set_pulse_start_in_percentage</code><span class="sig-paren">(</span><em>pin</em>, <em>percent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/signals/waveforms/pwm.html#PWM.set_pulse_start_in_percentage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pilectric.signals.waveforms.pwm.PWM.set_pulse_start_in_percentage" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pilectric.signals.waveforms.pwm.PWM.set_pulse_start_in_percentage">
+<span class="sig-name descname"><span class="pre">set_pulse_start_in_percentage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/signals/waveforms/pwm.html#PWM.set_pulse_start_in_percentage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pilectric.signals.waveforms.pwm.PWM.set_pulse_start_in_percentage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the GPIO high at a fraction into each cycle.</p>
 <p>The change takes affect when the update function is called.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">pin (int): The pin to set the pulse start for.
-percent (float):</p>
-<blockquote class="last">
-<div>The percentage of the way into the period that the pulse
-will go high.</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The pin to set the pulse start for.</p></li>
+<li><p><strong>percent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – The percentage of the way into the period
+that the pulse will go high.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="pilectric.signals.waveforms.pwm.PWM.stop">
-<code class="descname">stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/signals/waveforms/pwm.html#PWM.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pilectric.signals.waveforms.pwm.PWM.stop" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pilectric.signals.waveforms.pwm.PWM.stop">
+<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/signals/waveforms/pwm.html#PWM.stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pilectric.signals.waveforms.pwm.PWM.stop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stops the current PWM immediately.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="pilectric.signals.waveforms.pwm.PWM.update">
-<code class="descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/signals/waveforms/pwm.html#PWM.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pilectric.signals.waveforms.pwm.PWM.update" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="pilectric.signals.waveforms.pwm.PWM.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pilectric/signals/waveforms/pwm.html#PWM.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pilectric.signals.waveforms.pwm.PWM.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates the PWM to reflect the current settings.</p>
 </dd></dl>
 
@@ -317,7 +330,18 @@ will go high.</div></blockquote>
 </div>
 <div class="section" id="module-pilectric.signals.waveforms">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pilectric.signals.waveforms" title="Permalink to this headline">¶</a></h2>
-<p>Location for waveform generation.</p>
+<p>Copyright 2021 Owen Bulka</p>
+<p>Licensed under the Apache License, Version 2.0 (the “License”);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<blockquote>
+<div><p><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+</div></blockquote>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an “AS IS” BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
 </div>
 </div>
 
@@ -326,6 +350,10 @@ will go high.</div></blockquote>
            
           </div>
           <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="run.html" class="btn btn-neutral float-right" title="run module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pilectric.signals.html" class="btn btn-neutral float-left" title="pilectric.signals package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
 
   <hr/>
 

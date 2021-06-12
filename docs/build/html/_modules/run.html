@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html4" lang="en" >
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
   
@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,10 +31,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -150,12 +152,26 @@
             
   <h1>Source code for run</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
-<span class="sd">&quot;&quot;&quot; Testing &quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Copyright 2021 Owen Bulka</span>
+
+<span class="sd">Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="sd">you may not use this file except in compliance with the License.</span>
+<span class="sd">You may obtain a copy of the License at</span>
+
+<span class="sd">   http://www.apache.org/licenses/LICENSE-2.0</span>
+
+<span class="sd">Unless required by applicable law or agreed to in writing, software</span>
+<span class="sd">distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="sd">WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="sd">See the License for the specific language governing permissions and</span>
+<span class="sd">limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="c1"># Standard Imports</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
 <span class="c1"># Local Imports</span>
-<span class="kn">from</span> <span class="nn">pilectric.motor_control</span> <span class="k">import</span> <span class="n">stepper</span>
+<span class="kn">from</span> <span class="nn">pilectric.motor_control</span> <span class="kn">import</span> <span class="n">stepper</span>
 
 
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../run.html#run.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
@@ -175,7 +191,7 @@
     <span class="p">)</span>
 
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="n">motor</span><span class="o">.</span><span class="n">move_at_speed_for_time</span><span class="p">(</span><span class="mi">360</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="n">motor</span><span class="o">.</span><span class="n">move_at_speed_for_time</span><span class="p">(</span><span class="mi">360</span><span class="p">,</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">5</span><span class="p">)</span>
     <span class="c1"># motor.move_by_angle_in_time(360. * 60, 60)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--- </span><span class="si">%s</span><span class="s2"> seconds ---&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">))</span></div>
 
