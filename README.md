@@ -26,9 +26,3 @@ The documentation is built using sphinx. To build the documentation run:
     `python -m http.server 8000`
 
 To view the documentation go to localhost:8000 in a browser.
-
-To build the pdf version of the documentation, traverse to the docs directory and run:
-
-    `sphinx-build -b rinoh source build/rinoh`
-
-The pdf will be located at `./docs/build/rinoh/pilectric.pdf`
