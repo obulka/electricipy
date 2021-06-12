@@ -5,7 +5,7 @@ This module aims to create an abstraction layer on top of the raspberry pi GPIO 
 
 ## Setup
 
-1. Start the pigpio daemon by running `sudo pigpiod` on the raspberry pi.
+1. Start the pigpio daemon by running `sudo systemctl enable pigpiod && sudo systemctl start pigpiod` on the raspberry pi.
 2. This project's dependencies are managed by pipenv. To enter the virtual environment run:
 
     `pipenv shell`
