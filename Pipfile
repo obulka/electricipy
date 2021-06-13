@@ -4,15 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-rpi = "*"
-"rpi.gpio" = "*"
 pigpio = "*"
 
 [dev-packages]
 pylint = "*"
 simple-http-server = "*"
-sphinx = "*"
-rinohtype = "*"
+Sphinx = "*"
 sphinx-rtd-theme = "*"
 
 [requires]
