@@ -65,20 +65,30 @@ class StepperMotorController(GPIOController):
 
         self._microsteps = microsteps
 
-        self._stop = False
-        self._clockwise = True
+        self._counterclockwise = True
         self._wave_id = None
+
+    @property
+    def counterclockwise(self):
+        """ bool: True if motor set to rotate counterclockwise, False if
+        clockwise.
+        """
+        return self._counterclockwise
+
+    @counterclockwise.setter
+    def counterclockwise(self, rotate_counterclockwise):
+        self._counterclockwise = rotate_counterclockwise
 
     @property
     def clockwise(self):
         """ bool: True if motor set to rotate clockwise, False if
         counterclockwise.
         """
-        return self._clockwise
+        return not self._counterclockwise
 
     @clockwise.setter
     def clockwise(self, rotate_clockwise):
-        self._clockwise = rotate_clockwise
+        self._counterclockwise = not rotate_clockwise
 
     @property
     def microsteps(self):
@@ -106,7 +116,7 @@ class StepperMotorController(GPIOController):
         """ Initialize the GPIO pins. """
         self._pi.set_mode(self._step_pin, pigpio.OUTPUT)
         self._pi.set_mode(self._direction_pin, pigpio.OUTPUT)
-        self._pi.write(self._direction_pin, not self._clockwise)
+        self._pi.write(self._direction_pin, self._counterclockwise)
 
         microstep_pin_values = self.MICROSTEPS[self._microsteps]
         for pin, pin_value in zip(self._microstep_pins, microstep_pin_values):
@@ -115,7 +125,9 @@ class StepperMotorController(GPIOController):
 
     def _cleanup_gpio(self):
         """ Reset all pins to low to cleanup. """
+        print("cleanup")
         if self._wave_id is not None:
+            print("delete")
             self._pi.wave_delete(self._wave_id)
             self._wave_id = None
 
@@ -143,13 +155,13 @@ class StepperMotorController(GPIOController):
                 pigpio.pulse(0, 1 << self._step_pin, microsecond_step_delay),
             ])
 
-            wave_id = self._pi.wave_create()
+            self._wave_id = self._pi.wave_create()
 
             full_loop_denominator = 256 * 255 + 255
             num_full_loops = num_steps // full_loop_denominator
 
             if num_full_loops > full_loop_denominator:
-                raise ValueError("Too many steps for waveform, on the TODO list.")
+                raise ValueError("Too many steps for waveform.")
 
             full_loop_remainder = num_steps % full_loop_denominator
 
@@ -159,7 +171,7 @@ class StepperMotorController(GPIOController):
             wave_chain = [
                 255, 0,
                     255, 0,
-                        wave_id,
+                        self._wave_id,
                     255, 1,
                     255, 255,
                 255, 1,
@@ -167,7 +179,7 @@ class StepperMotorController(GPIOController):
             ]
             wave_chain.extend([
                 255, 0,                          # Start loop
-                    wave_id,                     # Create wave
+                    self._wave_id,               # Create wave
                 255, 1,                          # loop end
                 final_remainder, final_multiple, # repeat step_remainder + 256 * step_multiple
             ])
@@ -221,8 +233,12 @@ class StepperMotorController(GPIOController):
             angle (float): Number of degrees to move.
             speed (float): Speed in degrees/second to move at.
         """
-        steps = self._angle_to_steps(angle)
-        step_delay = self._angular_speed_to_step_delay(speed)
+        if angle < 0:
+            self.clockwise = True
+        else:
+            self.counterclockwise = True
+        steps = self._angle_to_steps(abs(angle))
+        step_delay = self._angular_speed_to_step_delay(abs(speed))
 
         self.step(steps, step_delay)
 

@@ -39,13 +39,13 @@ def main():
 
     start_time = time.time()
 
-    # motor.move_at_speed_for_time(360, 60 * 5)
+    # motor.move_at_speed_for_time(360, 60)
 
-    motor.move_by_angle_in_time(180, 1)
-    motor.clockwise = False
-    motor.move_by_angle_in_time(180, 1)
-    motor.clockwise = True
-    motor.move_by_angle_in_time(360, 1)
+    motor.move_by_angle_in_time(720, 1)
+    motor.move_by_angle_in_time(-720, 1)
+    motor.move_by_angle_in_time(360 * 3, 1)
+
+    # motor.step(10)
 
     print("--- %s seconds ---" % (time.time() - start_time))
 
