@@ -125,9 +125,7 @@ class StepperMotorController(GPIOController):
 
     def _cleanup_gpio(self):
         """ Reset all pins to low to cleanup. """
-        print("cleanup")
         if self._wave_id is not None:
-            print("delete")
             self._pi.wave_delete(self._wave_id)
             self._wave_id = None
 
@@ -190,7 +188,7 @@ class StepperMotorController(GPIOController):
             while self._pi.wave_tx_busy():
                 if self._stop:
                     break
-                time.sleep(0.1)
+                time.sleep(0.01)
 
     def _angle_to_steps(self, angle):
         """ Convert a number of degrees to the closest number of steps.

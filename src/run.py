@@ -23,31 +23,41 @@ from pilectric.motor_control import stepper
 
 def main():
     """ Run test """
-    step_pin = 18
-    direction_pin = 3
-    enable_pin = 4
-    microstep_pins = [15, 14]
-    microsteps = 64
+    step_pins = [18, 13]
+    direction_pins = [3, 27]
+    enable_pins = [4, 17]
+    microstep_pins = [[15, 14], [24, 23]]
+    microsteps = [64, 64]
 
-    motor = stepper.TMC2209(
-        step_pin,
-        direction_pin,
-        enable_pin,
-        microstep_pins=microstep_pins,
-        microsteps=microsteps,
-    )
+    motors = []
+    for step_pin, dir_pin, enable_pin, microstep_pin, microstep in zip(
+            step_pins,
+            direction_pins,
+            enable_pins,
+            microstep_pins,
+            microsteps):
+        motors.append(
+            stepper.TMC2209(
+                step_pin,
+                dir_pin,
+                enable_pin,
+                microstep_pins=microstep_pin,
+                microsteps=microstep,
+            )
+        )
 
     start_time = time.time()
 
     # motor.move_at_speed_for_time(360, 60)
 
-    motor.move_by_angle_in_time(720, 1)
-    motor.move_by_angle_in_time(-720, 1)
-    motor.move_by_angle_in_time(360 * 3, 1)
+    for motor in motors:
+        motor.move_by_angle_in_time(360, 1)
+        motor.move_by_angle_in_time(-360, 1)
+        motor.move_by_angle_in_time(720, 1)
+        print("--- %s seconds ---" % (time.time() - start_time))
 
     # motor.step(10)
 
-    print("--- %s seconds ---" % (time.time() - start_time))
 
 if __name__ == "__main__":
     main()
