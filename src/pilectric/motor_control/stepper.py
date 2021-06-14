@@ -23,7 +23,7 @@ import time
 import pigpio
 
 # Local Imports
-from .. import GPIOController
+from .. import GPIOController, GPIOManager
 
 
 class StepperMotorController(GPIOController):
@@ -56,6 +56,10 @@ class StepperMotorController(GPIOController):
                 microsteps you have set it to in order for thecontroller
                 to operate correctly. The default 1 microstep means the
                 motor is taking full steps.
+            pi_connection (pigpio.pi):
+                The connection to the raspberry pi. If not specified, we
+                assume the code is running on a pi and use the local
+                gpio.
         """
         super().__init__(pi_connection=pi_connection)
 
@@ -278,7 +282,8 @@ class TMC2209(StepperMotorController):
             direction_pin,
             enable_pin,
             microstep_pins=(),
-            microsteps=8):
+            microsteps=8,
+            pi_connection=None):
         """ Initialize the pin locations.
 
         Note: Uses BOARD mode for compatibility with more Pi versions.
@@ -297,6 +302,10 @@ class TMC2209(StepperMotorController):
                 microsteps you have set it to in order for thecontroller
                 to operate correctly. The default 1 microstep means the
                 motor is taking full steps.
+            pi_connection (pigpio.pi):
+                The connection to the raspberry pi. If not specified, we
+                assume the code is running on a pi and use the local
+                gpio.
 
         Raises:
             ValueError: If too many microstep pins are passed.
@@ -313,6 +322,7 @@ class TMC2209(StepperMotorController):
             direction_pin,
             microstep_pins=microstep_pins,
             microsteps=microsteps,
+            pi_connection=pi_connection,
         )
 
         self._enable_pin = enable_pin
@@ -329,3 +339,74 @@ class TMC2209(StepperMotorController):
         super()._cleanup_gpio()
 
         self._pi.write(self._enable_pin, True)
+
+
+class StepperMotorManager(GPIOManager):
+    """ Manage multiple stepper motors """
+
+    def __init__(self, stepper_controllers):
+        """ Initialize the manager.
+
+        Args:
+            stepper_controllers (list(GPIOController)):
+                The controllers to manage.
+        """
+        super().__init__(stepper_controllers)
+
+
+    @classmethod
+    def tmc2209_manager(
+            cls,
+            step_pins,
+            direction_pins,
+            enable_pins,
+            microstep_pins,
+            microsteps,
+            pi_connections=None):
+        """ Shortcut to initialize a manager of multiple TMC2209 v1.2
+        motor controllers. Note that all of the argument lists must be
+        the same length.
+
+        Args:
+            step_pins (list(int)): The step pin number to use. (STEP)
+            direction_pins (list(int)):
+                The direction pin number to use. (DIR)
+            enable_pins (list(int)): The enable pin number to use. (EN)
+
+        Keyword Args:
+            microstep_pins (list(tuple(int, int))):
+                The pin numbers for the microstep settings. (MS2, MS1)
+            microsteps (list(int)):
+                The number of microsteps to perform. If you have hard
+                wired the microstep pins you must pass the number of
+                microsteps you have set it to in order for thecontroller
+                to operate correctly. The default 1 microstep means the
+                motor is taking full steps.
+            pi_connections (list(pigpio.pi)):
+                The connection to the raspberry pi. If not specified, we
+                assume the code is running on a pi and use the local
+                gpio.
+        """
+        motors = []
+        for step_pin, dir_pin, enable_pin, microstep_pin, microstep, pi_connection in zip(
+                step_pins,
+                direction_pins,
+                enable_pins,
+                microstep_pins,
+                microsteps,
+                pi_connections if pi_connections else (None,) * len(step_pins)):
+            motors.append(
+                TMC2209(
+                    step_pin,
+                    dir_pin,
+                    enable_pin,
+                    microstep_pins=microstep_pin,
+                    microsteps=microstep,
+                    pi_connection=pi_connection,
+                )
+            )
+        return cls(motors)
+
+    def asynch_motor_command(self, motor_index, command, *args, **kwargs):
+        """"""
+        getattr(self._controllers[motor_index], command)(*args, **kwargs)

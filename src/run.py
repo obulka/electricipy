@@ -29,32 +29,26 @@ def main():
     microstep_pins = [[15, 14], [24, 23]]
     microsteps = [64, 64]
 
-    motors = []
-    for step_pin, dir_pin, enable_pin, microstep_pin, microstep in zip(
-            step_pins,
-            direction_pins,
-            enable_pins,
-            microstep_pins,
-            microsteps):
-        motors.append(
-            stepper.TMC2209(
-                step_pin,
-                dir_pin,
-                enable_pin,
-                microstep_pins=microstep_pin,
-                microsteps=microstep,
-            )
-        )
+    motor_manager = stepper.StepperMotorManager.tmc2209_manager(
+        step_pins,
+        direction_pins,
+        enable_pins,
+        microstep_pins,
+        microsteps,
+    )
 
     start_time = time.time()
 
     # motor.move_at_speed_for_time(360, 60)
 
-    for motor in motors:
-        motor.move_by_angle_in_time(360, 1)
-        motor.move_by_angle_in_time(-360, 1)
-        motor.move_by_angle_in_time(720, 1)
-        print("--- %s seconds ---" % (time.time() - start_time))
+    motor_manager.asynch_motor_command(0, "move_by_angle_in_time", 360, 1)
+    motor_manager.asynch_motor_command(1, "move_by_angle_in_time", 360, 1)
+    motor_manager.asynch_motor_command(0, "move_by_angle_in_time", -360, 1)
+    motor_manager.asynch_motor_command(1, "move_by_angle_in_time", -360, 1)
+    motor_manager.asynch_motor_command(0, "move_by_angle_in_time", 720, 1)
+    motor_manager.asynch_motor_command(1, "move_by_angle_in_time", 720, 1)
+
+    print("--- %s seconds ---" % (time.time() - start_time))
 
     # motor.step(10)
 

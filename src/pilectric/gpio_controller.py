@@ -27,9 +27,10 @@ class GPIOController:
         """ Initialize the controller.
 
         Keyword Args:
-            pi_connection (pigpio.pi): The connection to the raspberry
-                pi. If not specified, we assume the code is running on a
-                pi and use the local gpio.
+            pi_connection (pigpio.pi):
+                The connection to the raspberry pi. If not specified, we
+                assume the code is running on a pi and use the local
+                gpio.
 
         Raises:
             ValueError:
@@ -47,13 +48,14 @@ class GPIOController:
         self._stop = False
 
     def __exit__(self, exception_type, exception_value, exception_traceback):
-        """ Exit the routine.
+        """ Exit and clean up after the routine.
 
         Args:
             exception_type (Exception): Indicates class of exception.
             exception_value (str): Indicates the type of exception.
-            exception_traceback (traceback): Report which has all of the
-                information needed to solve the exception.
+            exception_traceback (traceback):
+                Report which has all of the information needed to solve
+                the exception.
         """
         self._cleanup_gpio()
 
@@ -66,3 +68,16 @@ class GPIOController:
     def stop(self):
         """ Stops the current routine immediately. """
         self._stop = True
+
+
+class GPIOManager:
+    """ Base class for managing multile gpio controllers. """
+
+    def __init__(self, controllers):
+        """ Initialize the manager.
+
+        Args:
+            controllers (list(GPIOController)):
+                The controllers to manage.
+        """
+        self._controllers = controllers
