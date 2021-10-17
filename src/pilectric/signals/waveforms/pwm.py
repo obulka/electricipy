@@ -20,7 +20,7 @@ PWM Module
 import pigpio
 
 # Local Imports
-from pilectric import GPIOController
+from pilectric.gpio_controller import GPIOController
 
 
 class PWM(GPIOController):
