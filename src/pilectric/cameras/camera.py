@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import math
-import multiprocessing
 
 
 class Camera:
@@ -114,5 +113,5 @@ class Camera:
 
     @property
     def sensor(self):
-        """"""
+        """pilectric.cameras.sensors.sensor.Sensor: The camera's sensor"""
         return self._sensor

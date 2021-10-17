@@ -18,6 +18,6 @@ from dataclasses import dataclass
 
 @dataclass
 class OpticalTube:
-    """"""
+    """ Class to repressent an optical tube eg. camera lens, telescope """
     focal_length: float # millimeters
     aperture: float # millimeters

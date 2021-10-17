@@ -14,9 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 from fractions import Fraction
-import json
-import requests
-import socket
 
 from libsonyapi import Actions
 from libsonyapi import Camera as SonyCameraAPI
@@ -98,7 +95,7 @@ class SonyCamera(SonyCameraAPI, Camera):
         if isinstance(shutter_speed, list):
             shutter_speed = shutter_speed[0]
 
-        if isinstance(shutter_speed, float) or isinstance(shutter_speed, int):
+        if isinstance(shutter_speed, (float, int)):
             if shutter_speed < 0.4:
                 shutter_speed = str(Fraction(shutter_speed).limit_denominator())
 

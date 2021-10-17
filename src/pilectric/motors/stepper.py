@@ -344,16 +344,6 @@ class TMC2209(StepperMotorController):
 class StepperMotorManager(GPIOManager):
     """ Manage multiple stepper motors """
 
-    def __init__(self, stepper_controllers):
-        """ Initialize the manager.
-
-        Args:
-            stepper_controllers (list(GPIOController)):
-                The controllers to manage.
-        """
-        super().__init__(stepper_controllers)
-
-
     @classmethod
     def tmc2209_manager(
             cls,
@@ -408,5 +398,5 @@ class StepperMotorManager(GPIOManager):
         return cls(motors)
 
     def asynch_motor_command(self, motor_index, command, *args, **kwargs):
-        """"""
+        """ NOT IMPLEMENTED, TODO"""
         getattr(self._controllers[motor_index], command)(*args, **kwargs)

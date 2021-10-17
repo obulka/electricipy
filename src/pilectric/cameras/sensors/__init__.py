@@ -14,3 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 from .sensor import APSC, APSH, CanonAPSC, FullFrame, MicroFourThirds
+
+__all__ = [
+   "APSC",
+   "APSH",
+   "CanonAPSC",
+   "FullFrame",
+   "MicroFourThirds",
+]

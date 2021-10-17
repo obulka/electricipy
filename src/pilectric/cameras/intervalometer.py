@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import multiprocessing
+import time
 
 
 class Intervalometer:
@@ -32,12 +33,12 @@ class Intervalometer:
     @property
     def duration(self):
         """float: The total time in seconds it will take to capture all images."""
-        return self._num_pictures * (self._camera.shutter_speed + self._delay) - self._delay
+        return self._num_images * (self._camera.shutter_speed + self._delay) - self._delay
 
     @property
     def fps(self):
         """float: The frames per second."""
-        return self._num_pictures / self.duration
+        return self._num_images / self.duration
 
     @property
     def running(self):
