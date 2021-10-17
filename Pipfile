@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 pigpio = "*"
+urllib3 = "*"
+libsonyapi = "*"
 
 [dev-packages]
 pylint = "*"

@@ -17,7 +17,8 @@ from .gpio_controller import GPIOController, GPIOManager
 
 
 __all__ = [
-    "motor_control",
+    "cameras",
+    "motors",
     "signals",
     "GPIOController",
     "GPIOManager",
