@@ -19,7 +19,7 @@ This module aims to create an abstraction layer on top of the raspberry pi GPIO 
 This example connects to a Sony camera and takes a picture. Before running this you must turn on the camera and go to Menu->Application List->Smart Remote Embedded.
 
 ```python
-from libsonyapi.actions import Actions
+from libsonyapi import Actions
 from pilectric.cameras.sony import SonyCamera
 
 camera = SonyCamera(network_interface="wlan0")
