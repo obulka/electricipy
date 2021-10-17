@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 pigpio = "*"
 urllib3 = "*"
-libsonyapi = "*"
 
 [dev-packages]
 pylint = "*"
@@ -16,3 +15,7 @@ sphinx-rtd-theme = "*"
 
 [requires]
 python_version = "3.7"
+
+[packages.libsonyapi]
+git = "https://github.com/obulka/libsonyapi.git"
+editable = true
