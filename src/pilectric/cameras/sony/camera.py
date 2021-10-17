@@ -13,27 +13,85 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+from fractions import Fraction
 import json
 import requests
 import socket
-import xml.etree.ElementTree as ET
 
-from libsonyapi.camera import Camera
+from libsonyapi.actions import Actions
+from libsonyapi.camera import Camera as SonyCameraAPI
+
+from ..camera import Camera
 
 
-class SonyCamera(Camera):
+class SonyCamera(SonyCameraAPI, Camera):
     """"""
 
-    def __init__(self, network_interface=None):
+    def __init__(self, network_interface=None, sensor=None, disable_auto_iso=True):
         """ Create a connection to interface with a camera.
-
-
         """
         self._network_interface = network_interface
 
-        super().__init__()
-
+        SonyCameraAPI.__init__(self)
         self.connected = True # Set to False in base class for some reason
+
+        self._disable_auto_iso = disable_auto_iso
+
+        Camera.__init__(
+            self,
+            self.shutter_speed,
+            self.iso_to_gain(self.iso),
+            sensor=sensor,
+        )
+
+    @property
+    def iso(self):
+        """int: The camera's iso. """
+        iso = self.run_command(Actions.getIsoSpeedRate)
+        if iso == "AUTO":
+            self.run_command(Actions.actHalfPressShutter)
+            iso = self.run_command(Actions.getIsoSpeedRate)
+            self.run_command(Actions.cancelHalfPressShutter)
+
+            if self._disable_auto_iso:
+                self.run_command(Actions.setIsoSpeedRate, iso)
+
+        return int(iso)
+
+    @iso.setter
+    def iso(self, new_iso):
+        if self.run_command(Actions.setIsoSpeedRate, str(new_iso)) == 0:
+            if new_iso == "AUTO":
+                self.run_command(Actions.actHalfPressShutter)
+                new_iso = self.run_command(Actions.getIsoSpeedRate)
+                self.run_command(Actions.cancelHalfPressShutter)
+
+                if self._disable_auto_iso:
+                    self.run_command(Actions.setIsoSpeedRate, new_iso)
+
+            self._gain = self.iso_to_gain(int(new_iso))
+
+    @property
+    def shutter_speed(self):
+        """float: The camera's shutter speed in seconds."""
+        shutter_speed = self.run_command(Actions.getShutterSpeed)
+        if shutter_speed == "BULB":
+            return shutter_speed
+
+        self._shutter_speed = float(Fraction(shutter_speed.replace('"', "/1")))
+
+        return self._shutter_speed
+
+    @shutter_speed.setter
+    def shutter_speed(self, new_shutter_speed):
+        if type(new_shutter_speed) == str:
+            new_shutter_speed = new_shutter_speed.strip('"')
+
+        elif type(new_shutter_speed) == float and new_shutter_speed < 1:
+            new_shutter_speed = Fraction(new_shutter_speed).limit_denominator()
+
+        if self.run_command(Actions.setShutterSpeed, str(new_shutter_speed)) == 0:
+            self._shutter_speed = float(Fraction(new_shutter_speed))
 
     def discover(self):
         """ Discover camera.
@@ -79,3 +137,72 @@ class SonyCamera(Camera):
 
         except socket.timeout:
             raise ConnectionError("You are not connected to the camera's wifi.")
+
+    def post_request(self, url, method, param=[]):
+        """
+        """
+        if type(param) is not list:
+            param = [param]
+        json_request = {"method": method, "params": param, "id": 1, "version": "1.0"}
+        request = requests.post(url, json.dumps(json_request))
+        response = json.loads(request.content)
+
+        return response
+
+    def run_command(self, command, param=[]):
+        """"""
+        response = self.do(command, param=param)
+
+        if "error" in response:
+            error = response["error"]
+            error_code = error[0]
+            error_message = error[-1]
+
+            if error_code == 1:
+                raise NotAvailableError(error_message)
+
+            elif error_code == 3:
+                raise IllegalArgumentError(error_message + ": {}".format(param))
+
+            elif error_code == 12:
+                raise InvalidActionError("Invalid action: " + error_message)
+
+            elif error_code == 403:
+                raise ForbiddenError(error_message)
+
+            elif error_code == 500:
+                raise OperationFailedError(error_message)
+
+            else:
+                raise ValueError("Unknown error: " + error_message)
+
+        else:
+            result = response.get("result", [])
+            if len(result) == 0:
+                return True
+
+            elif len(result) == 1:
+                return result[0]
+
+            else:
+                return result
+
+
+class NotAvailableError(Exception):
+    pass
+
+
+class IllegalArgumentError(Exception):
+    pass
+
+
+class InvalidActionError(Exception):
+    pass
+
+
+class ForbiddenError(Exception):
+    pass
+
+
+class OperationFailedError(Exception):
+    pass
