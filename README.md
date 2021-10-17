@@ -12,6 +12,20 @@ This module aims to create an abstraction layer on top of the raspberry pi GPIO 
 
     `pipenv install`
 
+## Examples
+
+### Connect to Camera
+
+This example connects to a Sony camera and takes a picture. Before running this you must turn on the camera and go to Menu->Application List->Smart Remote Embedded.
+
+```python
+from libsonyapi.actions import Actions
+from pilectric.cameras.sony import SonyCamera
+
+camera = SonyCamera(network_interface="wlan0")
+camera.do(Actions.actTakePicture)
+```
+
 ## Documentation
 
 The documentation is built using sphinx. To build the documentation run:
