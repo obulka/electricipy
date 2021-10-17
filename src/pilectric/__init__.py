@@ -18,4 +18,5 @@ __all__ = [
     "motors",
     "signals",
     "optics",
+    "gpio_controller",
 ]
