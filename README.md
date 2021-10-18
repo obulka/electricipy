@@ -28,6 +28,32 @@ camera.shutter_speed = 0.1
 camera.take_picture()
 ```
 
+### Intervalometer
+
+This example connects to a camera and takes 10 pictures, with a delay of 1 second in between.
+
+```python
+import time
+
+from libsonyapi import Actions
+
+from pilectric.cameras.intervalometer import Intervalometer
+from pilectric.cameras.sony import SonyCamera
+
+camera = SonyCamera(
+    shutter_speed=1,
+    iso=400,
+    network_interface="wlan0",
+)
+
+intervalometer = Intervalometer(camera, 10, delay=1)
+intervalometer.start()
+
+while intervalometer.running:
+    print("Still running...")
+    time.sleep(5)
+```
+
 ## Documentation
 
 The documentation is built using sphinx. To build the documentation run:

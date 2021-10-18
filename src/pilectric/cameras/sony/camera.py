@@ -24,7 +24,13 @@ from ..camera import Camera
 class SonyCamera(SonyCameraAPI, Camera):
     """ Class to control a Sony camera """
 
-    def __init__(self, network_interface=None, sensor=None, disable_auto_iso=True):
+    def __init__(
+            self,
+            shutter_speed=None,
+            iso=None,
+            network_interface=None,
+            sensor=None,
+            disable_auto_iso=True):
         """ Create a connection to interface with a sony camera.
 
         Keyword Args:
@@ -44,6 +50,12 @@ class SonyCamera(SonyCameraAPI, Camera):
         SonyCameraAPI.__init__(self, network_interface=network_interface)
 
         self._disable_auto_iso = disable_auto_iso
+
+        if shutter_speed is not None:
+            self.shutter_speed = shutter_speed
+
+        if iso is not None:
+            self.iso = iso
 
         Camera.__init__(
             self,
