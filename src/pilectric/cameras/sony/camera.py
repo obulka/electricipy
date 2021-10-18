@@ -34,6 +34,8 @@ class SonyCamera(SonyCameraAPI, Camera):
         """ Create a connection to interface with a sony camera.
 
         Keyword Args:
+            shutter_speed (float): The shutter speed in seconds.
+            iso (int): The initial ISO.
             network_interface (str): The network interface to use when
                 connecting to the camera.
             sensor (pilectric.cameras.sensors.sensor.Sensor): The sensor
