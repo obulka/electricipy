@@ -23,7 +23,9 @@ from libsonyapi import Actions
 from pilectric.cameras.sony import SonyCamera
 
 camera = SonyCamera(network_interface="wlan0")
-camera.do(Actions.actTakePicture)
+camera.iso = 400
+camera.shutter_speed = 0.1
+camera.take_picture()
 ```
 
 ## Documentation
