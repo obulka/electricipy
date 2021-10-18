@@ -1,6 +1,6 @@
 # Pilectric
 
-This module aims to create an abstraction layer on top of the raspberry pi GPIO module, allowing for easy control over components such as motors.
+This module allows for easy control over a variety of hardware components through a Raspberry Pi.
 
 
 ## Setup
@@ -23,7 +23,9 @@ from libsonyapi import Actions
 from pilectric.cameras.sony import SonyCamera
 
 camera = SonyCamera(network_interface="wlan0")
-camera.do(Actions.actTakePicture)
+camera.iso = 400
+camera.shutter_speed = 0.1
+camera.take_picture()
 ```
 
 ## Documentation
