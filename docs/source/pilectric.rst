@@ -1,17 +1,16 @@
 pilectric package
 =================
 
-Subpackages
------------
+Submodules
+----------
 
 .. toctree::
    :maxdepth: 4
 
-   pilectric.motor_control
+   pilectric.cameras
+   pilectric.optics
+   pilectric.motors
    pilectric.signals
-
-Submodules
-----------
 
 pilectric.gpio\_controller module
 ---------------------------------

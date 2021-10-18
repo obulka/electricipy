@@ -1,13 +1,13 @@
-pilectric.motor\_control package
+pilectric.cameras.sony package
 ================================
 
 Submodules
 ----------
 
-pilectric.motor\_control.stepper module
+pilectric.cameras.sony.camera module
 ---------------------------------------
 
-.. automodule:: pilectric.motor_control.stepper
+.. automodule:: pilectric.cameras.sony.camera
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ pilectric.motor\_control.stepper module
 Module contents
 ---------------
 
-.. automodule:: pilectric.motor_control
+.. automodule:: pilectric.cameras.sony
    :members:
    :undoc-members:
    :show-inheritance:

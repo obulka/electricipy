@@ -5,4 +5,3 @@ src
    :maxdepth: 4
 
    pilectric
-   run

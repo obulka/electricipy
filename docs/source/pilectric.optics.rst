@@ -1,13 +1,13 @@
-pilectric.motor\_control package
+pilectric.optics package
 ================================
 
 Submodules
 ----------
 
-pilectric.motor\_control.stepper module
+pilectric.optics.optical_tube module
 ---------------------------------------
 
-.. automodule:: pilectric.motor_control.stepper
+.. automodule:: pilectric.optics.optical_tube
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ pilectric.motor\_control.stepper module
 Module contents
 ---------------
 
-.. automodule:: pilectric.motor_control
+.. automodule:: pilectric.optics
    :members:
    :undoc-members:
    :show-inheritance:
