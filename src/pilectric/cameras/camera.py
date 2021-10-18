@@ -115,3 +115,7 @@ class Camera:
     def sensor(self):
         """pilectric.cameras.sensors.sensor.Sensor: The camera's sensor"""
         return self._sensor
+
+    def take_picture(self):
+        """ Take a picture """
+        raise NotImplementedError("Must be implemented by heir.")

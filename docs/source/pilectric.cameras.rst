@@ -4,10 +4,10 @@ pilectric.cameras package
 Submodules
 ----------
 
-pilectric.cameras.sony module
+pilectric.cameras.sony.camera module
 ---------------------------------------
 
-.. automodule:: pilectric.cameras.sony
+.. automodule:: pilectric.cameras.sony.camera
    :members:
    :undoc-members:
    :show-inheritance:

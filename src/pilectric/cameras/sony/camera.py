@@ -38,6 +38,8 @@ class SonyCamera(SonyCameraAPI, Camera):
         Raises:
             requests.exceptions.ConnectionError: If the camera cannot be
                 connected to.
+            libsonyapi.camera.NotAvailableError: If the camera is not
+                available.
         """
         SonyCameraAPI.__init__(self, network_interface=network_interface)
 
@@ -107,3 +109,7 @@ class SonyCamera(SonyCameraAPI, Camera):
 
         if self.do(Actions.setShutterSpeed, shutter_speed) == 0:
             self._shutter_speed = float(Fraction(shutter_speed.strip('"')))
+
+    def take_picture(self):
+        """ Take a picture """
+        self.do(Actions.actTakePicture)
