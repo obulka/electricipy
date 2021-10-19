@@ -1,6 +1,6 @@
 # electricipy
 
-This module allows for easy control over a variety of hardware components through a Raspberry Pi.
+This module allows for easy control over a variety of hardware components.
 
 
 ## Setup
