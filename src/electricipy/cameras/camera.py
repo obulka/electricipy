@@ -33,7 +33,7 @@ class Camera:
             gain (float): The gain in decibles.
 
         Keyword Args:
-            sensor (pilectric.cameras.sensors.sensor.Sensor): The camera
+            sensor (electricipy.cameras.sensors.sensor.Sensor): The camera
                 sensor.
             zero_gain_iso (int): The ISO for which the gain is zero.
             decibles_per_stop (float): The number of decibles it takes
@@ -113,7 +113,7 @@ class Camera:
 
     @property
     def sensor(self):
-        """pilectric.cameras.sensors.sensor.Sensor: The camera's sensor"""
+        """electricipy.cameras.sensors.sensor.Sensor: The camera's sensor"""
         return self._sensor
 
     def take_picture(self):

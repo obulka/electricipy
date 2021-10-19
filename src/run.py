@@ -18,7 +18,7 @@ limitations under the License.
 import time
 
 # Local Imports
-from pilectric.motors import stepper
+from electricipy.motors import stepper
 
 
 def main():
