@@ -18,11 +18,11 @@ limitations under the License.
 import time
 
 # Local Imports
-from electricipy.motors import stepper
+from electricipy.raspi.motors import stepper
 
 
 def main():
-    """ Run test """
+    """ Script to test development """
     step_pins = [18, 13]
     direction_pins = [3, 27]
     enable_pins = [4, 17]

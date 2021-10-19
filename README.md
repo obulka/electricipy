@@ -65,6 +65,6 @@ The documentation is built using sphinx. To build the documentation run:
 
     `cd build/html`
 
-    `python -m http.server 8000`
+    `python -m http.server [--bind <ip address>] 8000`
 
 To view the documentation go to localhost:8000 in a browser.

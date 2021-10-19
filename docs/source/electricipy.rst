@@ -1,5 +1,5 @@
 electricipy package
-=================
+===================
 
 Submodules
 ----------
@@ -9,13 +9,12 @@ Submodules
 
    electricipy.cameras
    electricipy.optics
-   electricipy.motors
-   electricipy.signals
+   electricipy.raspi
 
-electricipy.gpio\_controller module
----------------------------------
+electricipy.raspi.gpio\_controller module
+-----------------------------------------
 
-.. automodule:: electricipy.gpio_controller
+.. automodule:: electricipy.raspi.gpio_controller
    :members:
    :undoc-members:
    :show-inheritance:

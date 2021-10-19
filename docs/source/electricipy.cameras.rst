@@ -29,7 +29,7 @@ electricipy.cameras.camera module
    :show-inheritance:
 
 electricipy.cameras.intervalometer module
----------------------------------------
+-----------------------------------------
 
 .. automodule:: electricipy.cameras.intervalometer
    :members:

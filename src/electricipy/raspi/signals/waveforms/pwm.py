@@ -20,7 +20,7 @@ PWM Module
 import pigpio
 
 # Local Imports
-from electricipy.gpio_controller import GPIOController
+from electricipy.raspi.gpio_controller import GPIOController
 
 
 class PWM(GPIOController):

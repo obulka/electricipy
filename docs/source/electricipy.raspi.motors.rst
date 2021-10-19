@@ -1,13 +1,13 @@
-electricipy.motors package
+electricipy.raspi.motors package
 ================================
 
-Submodules
-----------
+Subpackages
+-----------
 
-electricipy.motors.stepper module
+electricipy.raspi.motors.stepper module
 ---------------------------------------
 
-.. automodule:: electricipy.motors.stepper
+.. automodule:: electricipy.raspi.motors.stepper
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ electricipy.motors.stepper module
 Module contents
 ---------------
 
-.. automodule:: electricipy.motors
+.. automodule:: electricipy.raspi.motors
    :members:
    :undoc-members:
    :show-inheritance:

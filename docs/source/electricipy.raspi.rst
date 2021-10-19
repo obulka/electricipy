@@ -1,18 +1,19 @@
-electricipy.signals package
+electricipy.raspi package
 =========================
 
-Subpackages
+Submodules
 -----------
 
 .. toctree::
    :maxdepth: 4
 
-   electricipy.signals.waveforms
+   electricipy.raspi.signals
+   electricipy.raspi.motors
 
 Module contents
 ---------------
 
-.. automodule:: electricipy.signals
+.. automodule:: electricipy.raspi
    :members:
    :undoc-members:
    :show-inheritance:
