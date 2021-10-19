@@ -33,7 +33,7 @@ class SonyCamera(SonyCameraAPI, Camera):
             network_interface=None,
             sensor=None,
             disable_auto_iso=True,
-            retry_attempts=0,
+            retry_attempts=1,
             retry_delay=1):
         """ Create a connection to interface with a sony camera.
 
@@ -56,21 +56,27 @@ class SonyCamera(SonyCameraAPI, Camera):
             libsonyapi.camera.NotAvailableError: If the camera is not
                 available.
         """
-        attempts = 0
-        while attempts <= retry_attempts:
-            attempts += 1
-
+        for attempt in range(retry_attempts + 1):
             try:
                 SonyCameraAPI.__init__(self, network_interface=network_interface)
+                break
 
-                self._disable_auto_iso = disable_auto_iso
+            except ConnectionError as err:
+                if attempt == retry_attempts:
+                    raise err
 
-                if shutter_speed is not None:
-                    self.shutter_speed = shutter_speed
+                time.sleep(retry_delay)
 
-                if iso is not None:
-                    self.iso = iso
+        self._disable_auto_iso = disable_auto_iso
 
+        if shutter_speed is not None:
+            self.shutter_speed = shutter_speed
+
+        if iso is not None:
+            self.iso = iso
+
+        for attempt in range(retry_attempts + 1):
+            try:
                 Camera.__init__(
                     self,
                     self.shutter_speed,
@@ -79,8 +85,8 @@ class SonyCamera(SonyCameraAPI, Camera):
                 )
                 break
 
-            except (ConnectionError, NotAvailableError) as err:
-                if attempts > retry_attempts:
+            except NotAvailableError as err:
+                if attempt == retry_attempts:
                     raise err
 
                 time.sleep(retry_delay)
