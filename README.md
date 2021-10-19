@@ -57,14 +57,11 @@ while intervalometer.running:
 ## Documentation
 
 The documentation is built using sphinx. To build the documentation run:
-    `pipenv install --dev`
-
-    `cd docs`
-
-    `make html`
-
-    `cd build/html`
-
-    `python -m http.server [--bind <ip address>] 8000`
+```
+cd docs
+make html
+cd build/html
+python -m http.server [--bind <ip address>] 8000
+```
 
 To view the documentation go to localhost:8000 in a browser.
