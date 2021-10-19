@@ -64,4 +64,4 @@ cd build/html
 python -m http.server [--bind <ip address>] 8000
 ```
 
-To view the documentation go to <ip address>:8000 in a browser.
+To view the documentation go to \<ip address\>:8000 in a browser.
