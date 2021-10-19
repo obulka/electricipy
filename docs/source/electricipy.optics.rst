@@ -1,13 +1,13 @@
-pilectric.optics package
+electricipy.optics package
 ================================
 
 Submodules
 ----------
 
-pilectric.optics.optical_tube module
+electricipy.optics.optical_tube module
 ---------------------------------------
 
-.. automodule:: pilectric.optics.optical_tube
+.. automodule:: electricipy.optics.optical_tube
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ pilectric.optics.optical_tube module
 Module contents
 ---------------
 
-.. automodule:: pilectric.optics
+.. automodule:: electricipy.optics
    :members:
    :undoc-members:
    :show-inheritance:

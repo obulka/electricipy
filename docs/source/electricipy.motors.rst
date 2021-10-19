@@ -1,13 +1,13 @@
-pilectric.motors package
+electricipy.motors package
 ================================
 
 Submodules
 ----------
 
-pilectric.motors.stepper module
+electricipy.motors.stepper module
 ---------------------------------------
 
-.. automodule:: pilectric.motors.stepper
+.. automodule:: electricipy.motors.stepper
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ pilectric.motors.stepper module
 Module contents
 ---------------
 
-.. automodule:: pilectric.motors
+.. automodule:: electricipy.motors
    :members:
    :undoc-members:
    :show-inheritance:

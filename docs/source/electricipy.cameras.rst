@@ -1,37 +1,37 @@
-pilectric.cameras package
+electricipy.cameras package
 ================================
 
 Submodules
 ----------
 
-pilectric.cameras.sony.camera module
+electricipy.cameras.sony.camera module
 ---------------------------------------
 
-.. automodule:: pilectric.cameras.sony.camera
+.. automodule:: electricipy.cameras.sony.camera
    :members:
    :undoc-members:
    :show-inheritance:
 
-pilectric.cameras.sensors module
+electricipy.cameras.sensors module
 ---------------------------------------
 
-.. automodule:: pilectric.cameras.sensors
+.. automodule:: electricipy.cameras.sensors
    :members:
    :undoc-members:
    :show-inheritance:
 
-pilectric.cameras.camera module
+electricipy.cameras.camera module
 ---------------------------------------
 
-.. automodule:: pilectric.cameras.camera
+.. automodule:: electricipy.cameras.camera
    :members:
    :undoc-members:
    :show-inheritance:
 
-pilectric.cameras.intervalometer module
+electricipy.cameras.intervalometer module
 ---------------------------------------
 
-.. automodule:: pilectric.cameras.intervalometer
+.. automodule:: electricipy.cameras.intervalometer
    :members:
    :undoc-members:
    :show-inheritance:
@@ -39,7 +39,7 @@ pilectric.cameras.intervalometer module
 Module contents
 ---------------
 
-.. automodule:: pilectric.cameras
+.. automodule:: electricipy.cameras
    :members:
    :undoc-members:
    :show-inheritance:

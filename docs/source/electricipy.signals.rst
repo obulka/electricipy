@@ -1,4 +1,4 @@
-pilectric.signals package
+electricipy.signals package
 =========================
 
 Subpackages
@@ -7,12 +7,12 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   pilectric.signals.waveforms
+   electricipy.signals.waveforms
 
 Module contents
 ---------------
 
-.. automodule:: pilectric.signals
+.. automodule:: electricipy.signals
    :members:
    :undoc-members:
    :show-inheritance:

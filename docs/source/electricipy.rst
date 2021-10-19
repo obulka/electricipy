@@ -1,4 +1,4 @@
-pilectric package
+electricipy package
 =================
 
 Submodules
@@ -7,15 +7,15 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   pilectric.cameras
-   pilectric.optics
-   pilectric.motors
-   pilectric.signals
+   electricipy.cameras
+   electricipy.optics
+   electricipy.motors
+   electricipy.signals
 
-pilectric.gpio\_controller module
+electricipy.gpio\_controller module
 ---------------------------------
 
-.. automodule:: pilectric.gpio_controller
+.. automodule:: electricipy.gpio_controller
    :members:
    :undoc-members:
    :show-inheritance:
@@ -23,7 +23,7 @@ pilectric.gpio\_controller module
 Module contents
 ---------------
 
-.. automodule:: pilectric
+.. automodule:: electricipy
    :members:
    :undoc-members:
    :show-inheritance:
