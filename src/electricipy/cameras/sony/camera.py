@@ -14,9 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 from fractions import Fraction
+import time
 
 from libsonyapi import Actions
 from libsonyapi import Camera as SonyCameraAPI
+from libsonyapi.camera import NotAvailableError
 
 from ..camera import Camera
 
@@ -30,7 +32,9 @@ class SonyCamera(SonyCameraAPI, Camera):
             iso=None,
             network_interface=None,
             sensor=None,
-            disable_auto_iso=True):
+            disable_auto_iso=True,
+            retry_attempts=0,
+            retry_delay=1):
         """ Create a connection to interface with a sony camera.
 
         Keyword Args:
@@ -38,10 +42,13 @@ class SonyCamera(SonyCameraAPI, Camera):
             iso (int): The initial ISO.
             network_interface (str): The network interface to use when
                 connecting to the camera.
-            sensor (electricipy.cameras.sensors.sensor.Sensor): The sensor
-                used by the camera.
+            sensor (electricipy.cameras.sensors.sensor.Sensor): The
+                sensor used by the camera.
             disable_auto_iso (bool): If True the ISO will be
                 automatically set, disabling AUTO.
+            retry_attempts (int): The number of times to retry
+                connecting.
+            retry_delay (float): The delay between retry attempts.
 
         Raises:
             requests.exceptions.ConnectionError: If the camera cannot be
@@ -49,22 +56,34 @@ class SonyCamera(SonyCameraAPI, Camera):
             libsonyapi.camera.NotAvailableError: If the camera is not
                 available.
         """
-        SonyCameraAPI.__init__(self, network_interface=network_interface)
+        attempts = 0
+        while attempts <= retry_attempts:
+            attempts += 1
 
-        self._disable_auto_iso = disable_auto_iso
+            try:
+                SonyCameraAPI.__init__(self, network_interface=network_interface)
 
-        if shutter_speed is not None:
-            self.shutter_speed = shutter_speed
+                self._disable_auto_iso = disable_auto_iso
 
-        if iso is not None:
-            self.iso = iso
+                if shutter_speed is not None:
+                    self.shutter_speed = shutter_speed
 
-        Camera.__init__(
-            self,
-            self.shutter_speed,
-            self.iso_to_gain(self.iso),
-            sensor=sensor,
-        )
+                if iso is not None:
+                    self.iso = iso
+
+                Camera.__init__(
+                    self,
+                    self.shutter_speed,
+                    self.iso_to_gain(self.iso),
+                    sensor=sensor,
+                )
+                break
+
+            except (ConnectionError, NotAvailableError) as err:
+                if attempts > retry_attempts:
+                    raise err
+
+                time.sleep(retry_delay)
 
     @property
     def iso(self):
@@ -123,6 +142,14 @@ class SonyCamera(SonyCameraAPI, Camera):
 
         if self.do(Actions.setShutterSpeed, shutter_speed) == 0:
             self._shutter_speed = float(Fraction(shutter_speed.strip('"')))
+
+    @Camera.gain.setter
+    def gain(self, new_gain):
+        self.iso = self.gain_to_iso(
+            new_gain,
+            zero_gain_iso=self._zero_gain_iso,
+            decibles_per_stop=self._decibles_per_stop,
+        )
 
     def take_picture(self):
         """ Take a picture """

@@ -89,6 +89,10 @@ class Camera:
         """float: The camera's gain in decibles. """
         return self._gain
 
+    @gain.setter
+    def gain(self, new_gain):
+        self._gain = new_gain
+
     @property
     def iso(self):
         """int: The camera's iso. """
