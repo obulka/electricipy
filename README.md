@@ -5,7 +5,7 @@ This module allows for easy control over a variety of hardware components.
 
 ## Setup
 
-1. If you are using modules in the `electricipy.raspi` module, start the pigpio daemon by running `sudo systemctl enable pigpiod && sudo systemctl start pigpiod` on the raspberry pi.
+1. If you are using the `electricipy.raspi` module, start the pigpio daemon by running `sudo systemctl enable pigpiod && sudo systemctl start pigpiod` on the raspberry pi.
 2. This project's dependencies are managed by pipenv. If you just want to run the project, run: `pipenv install`
 
 4. For development, enter the virtual environment by running: `pipenv shell`
