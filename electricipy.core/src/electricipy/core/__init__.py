@@ -15,6 +15,5 @@ limitations under the License.
 """
 __all__ = [
     "cameras",
-    "raspi",
     "optics",
 ]
