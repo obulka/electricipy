@@ -20,7 +20,7 @@ This example connects to a Sony camera and takes a picture. Before running this 
 
 ```python
 from libsonyapi import Actions
-from electricipy.core.cameras.sony import SonyCamera
+from electricipy.cameras.sony import SonyCamera
 
 camera = SonyCamera(network_interface="wlan0")
 camera.iso = 400
@@ -37,8 +37,8 @@ import time
 
 from libsonyapi import Actions
 
-from electricipy.core.cameras.intervalometer import Intervalometer
-from electricipy.core.cameras.sony import SonyCamera
+from electricipy.cameras.intervalometer import Intervalometer
+from electricipy.cameras.sony import SonyCamera
 
 camera = SonyCamera(
     shutter_speed=1,

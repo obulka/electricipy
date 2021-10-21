@@ -5,7 +5,7 @@ This module allows for easy control over a variety of hardware components.
 
 ## Setup
 
-See the module specific README files under electricipy.core and electricipy.raspi
+See the module specific README files under electricipy and electricipy.raspi
 
 
 ## Documentation

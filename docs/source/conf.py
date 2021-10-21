@@ -15,7 +15,7 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../../electricipy.core/src'))
+sys.path.insert(0, os.path.abspath('../../electricipy/src'))
 sys.path.insert(0, os.path.abspath('../../electricipy.raspi/src'))
 
 # -- Project information -----------------------------------------------------

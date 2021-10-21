@@ -42,7 +42,7 @@ class SonyCamera(SonyCameraAPI, Camera):
             iso (int): The initial ISO.
             network_interface (str): The network interface to use when
                 connecting to the camera.
-            sensor (electricipy.core.cameras.sensors.Sensor): The
+            sensor (electricipy.cameras.sensors.Sensor): The
                 sensor used by the camera.
             disable_auto_iso (bool): If True the ISO will be
                 automatically set, disabling AUTO.

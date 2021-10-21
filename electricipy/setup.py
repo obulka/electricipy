@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="electricipy.core",
+    name="electricipy",
     version="0.1",
     description="Electronic device control.",
     author="Owen Bulka",
