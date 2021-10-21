@@ -5,12 +5,11 @@ This module allows for easy control over a variety of hardware components.
 
 ## Setup
 
-1. Start the pigpio daemon by running `sudo systemctl enable pigpiod && sudo systemctl start pigpiod` on the raspberry pi.
-2. This project's dependencies are managed by pipenv. If you just want to run the project, run: `pipenv install`
+1. This project's dependencies are managed by pipenv. If you just want to run the project, run: `pipenv install`
 
-4. For development, enter the virtual environment by running: `pipenv shell`
+2. For development, enter the virtual environment by running: `pipenv shell`
 
-4. If it is your first time in the virtual environment run: `pipenv sync --dev`
+3. If it is your first time in the virtual environment run: `pipenv sync --dev`
 
 ## Examples
 
@@ -53,15 +52,3 @@ while intervalometer.running:
     print("Still running...")
     time.sleep(5)
 ```
-
-## Documentation
-
-The documentation is built using sphinx. To build the documentation run:
-```
-cd docs
-make html
-cd build/html
-python -m http.server [--bind <ip address>] 8000
-```
-
-To view the documentation go to \<ip address\>:8000 in a browser.
