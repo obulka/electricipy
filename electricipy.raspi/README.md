@@ -1,4 +1,4 @@
-# electricipy
+# electricipy.raspi
 
 This module allows for easy control over a variety of hardware components using a Raspberry Pi.
 
