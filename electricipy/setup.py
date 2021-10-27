@@ -9,4 +9,5 @@ setup(
     author="Owen Bulka",
     packages=find_packages(where="./src"),
     package_dir={"": "src"},
+    scripts=["./src/timelapse"],
 )
