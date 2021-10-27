@@ -51,7 +51,7 @@ class SonyCamera(SonyCameraAPI, Camera):
             retry_delay (float): The delay between retry attempts.
 
         Raises:
-            requests.exceptions.ConnectionError: If the camera cannot be
+            ConnectionError: If the camera cannot be
                 connected to.
             libsonyapi.camera.NotAvailableError: If the camera is not
                 available.
@@ -69,14 +69,15 @@ class SonyCamera(SonyCameraAPI, Camera):
 
         self._disable_auto_iso = disable_auto_iso
 
-        if shutter_speed is not None:
-            self.shutter_speed = shutter_speed
-
-        if iso is not None:
-            self.iso = iso
 
         for attempt in range(retry_attempts + 1):
             try:
+                if shutter_speed is not None:
+                    self.shutter_speed = shutter_speed
+
+                if iso is not None:
+                    self.iso = iso
+
                 Camera.__init__(
                     self,
                     self.shutter_speed,
@@ -123,6 +124,7 @@ class SonyCamera(SonyCameraAPI, Camera):
         """float: The camera's shutter speed in seconds."""
         shutter_speed = self.do(Actions.getShutterSpeed)
         if shutter_speed == "BULB":
+            # TODO handle bulb and use bulb for odd exposure lengths
             return shutter_speed
 
         self._shutter_speed = float(Fraction(shutter_speed.strip('"')))
@@ -158,5 +160,9 @@ class SonyCamera(SonyCameraAPI, Camera):
         )
 
     def take_picture(self):
-        """Take a picture"""
-        self.do(Actions.actTakePicture)
+        """Take a picture.
+
+        Returns:
+            str: The path to, or url of, the captured image.
+        """
+        return self.do(Actions.actTakePicture)[0]

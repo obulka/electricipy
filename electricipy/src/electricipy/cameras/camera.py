@@ -121,5 +121,9 @@ class Camera:
         return self._sensor
 
     def take_picture(self):
-        """ Take a picture """
+        """Take a picture.
+
+        Returns:
+            str: The path to, or url of, the captured image.
+        """
         raise NotImplementedError("Must be implemented by heir.")
