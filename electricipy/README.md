@@ -18,7 +18,6 @@ This module allows for easy control over a variety of hardware components.
 This example connects to a Sony camera and takes a picture. Before running this you must turn on the camera and go to Menu->Application List->Smart Remote Embedded.
 
 ```python
-from libsonyapi import Actions
 from electricipy.cameras.sony import SonyCamera
 
 camera = SonyCamera(network_interface="wlan0")
@@ -33,8 +32,6 @@ This example connects to a camera and takes 10 pictures, with a delay of 1 secon
 
 ```python
 import time
-
-from libsonyapi import Actions
 
 from electricipy.cameras.intervalometer import Intervalometer
 from electricipy.cameras.sony import SonyCamera
