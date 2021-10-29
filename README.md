@@ -54,7 +54,7 @@ There is a commandline tool named 'timelapse' that can be used to easily connect
 
 ### Stepper Motor Control
 
-Spin the motor one time in one minute, assuming you are using a TMC2209 stepper motor driver and have it hooked up to the specified pins. Motor control is a work in progress.
+This example rotates the motor ccw at 1Hz for 1min, then rotates it cw a quarter turn in 15s, and finally completes a full ccw rotation in 1s. This assumes you are using a TMC2209 stepper motor driver and have it hooked up to the specified pins. Motor control is a work in progress. Note that a negative angle will rotate clockwise, but not a negative speed (it's not velocity!)
 
 ```python
 from electricipy.raspi.motors import stepper
@@ -74,9 +74,9 @@ motor_manager = stepper.TMC2209(
 )
 
 motor.move_at_speed_for_time(360, 60)
-
+motor.move_by_angle_in_time(-90, 15)
+motor.move_by_angle_at_speed(360, 360)
 ```
-
 
 ## Documentation
 
