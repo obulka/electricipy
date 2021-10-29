@@ -183,6 +183,10 @@ class SonyCamera(SonyCameraAPI, Camera):
 
         Returns:
             str: The path to, or url of, the captured image.
+
+        Raises:
+            libsonyapi.LongShootingError: If the picture is taking much
+                longer than the shutter speed would suggest.
         """
         try:
             return self.do(Actions.actTakePicture)[0]
