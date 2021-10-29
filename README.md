@@ -49,7 +49,7 @@ while intervalometer.running:
 
 ### Timelapse
 
-There is a commandline tool named 'timelapse' that can be used to easily connect to and shoot a timelapse. Run `timelapse -h` to see the usage information. An example use would be `timelapse --iso 100 --ss 1 -c sony -n 10 -v`. Use Ctrl+C to abort the timelapse at any time.
+There is a command line tool named 'timelapse' that can be used to easily connect to and shoot a timelapse. Run `timelapse -h` to see the usage information. An example use would be `timelapse --iso 100 --ss 1 -c sony -n 10 -v`. Use Ctrl+C to abort the timelapse at any time.
 
 
 ### Stepper Motor Control
