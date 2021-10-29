@@ -12,7 +12,7 @@ See the module specific README files under electricipy and electricipy.raspi
 
 ### Connect to Camera
 
-This example connects to a Sony camera and takes a picture. Before running this you must turn on the camera and go to Menu->Application List->Smart Remote Embedded.
+This example connects to a Sony camera and takes a picture. Before running this you must turn on the camera and go to Menu->Application List->Smart Remote Embedded. When initializing the camera object you can pass retry_attempts and retry delay parameters to increase the chances of connecting on the first execution.
 
 ```python
 from electricipy.cameras.sony import SonyCamera
