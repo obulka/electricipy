@@ -18,7 +18,7 @@ import time
 
 from libsonyapi import Actions
 from libsonyapi import Camera as SonyCameraAPI
-from libsonyapi.camera import NotAvailableError
+from libsonyapi.camera import NotAvailableError, LongShootingError
 
 from ..camera import Camera
 
@@ -68,7 +68,6 @@ class SonyCamera(SonyCameraAPI, Camera):
                 time.sleep(retry_delay)
 
         self._disable_auto_iso = disable_auto_iso
-
 
         for attempt in range(retry_attempts + 1):
             try:
@@ -185,4 +184,18 @@ class SonyCamera(SonyCameraAPI, Camera):
         Returns:
             str: The path to, or url of, the captured image.
         """
-        return self.do(Actions.actTakePicture)[0]
+        try:
+            return self.do(Actions.actTakePicture)[0]
+
+        except LongShootingError:
+            # We will wait the time it took to throw the first error plus
+            # an additional shutter speed
+            start_time = time.time()
+            while time.time() - start_time <= self._shutter_speed:
+                try:
+                    return self.do(Actions.awaitTakePicture)[0]
+
+                except LongShootingError:
+                    continue
+
+            raise LongShootingError("Image taking unexpectedly long.")
