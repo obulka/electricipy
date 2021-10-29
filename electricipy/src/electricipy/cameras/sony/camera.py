@@ -93,6 +93,11 @@ class SonyCamera(SonyCameraAPI, Camera):
                 time.sleep(retry_delay)
 
     @property
+    def isos(self):
+        """list(str): The supported ISO settings."""
+        return self.do(Actions.getSupportedIsoSpeedRate)
+
+    @property
     def iso(self):
         """int: The camera's iso."""
         iso = self.do(Actions.getIsoSpeedRate)
@@ -120,14 +125,25 @@ class SonyCamera(SonyCameraAPI, Camera):
             self._gain = self.iso_to_gain(int(new_iso))
 
     @property
+    def shutter_speeds(self):
+        """list(str): The supported shutter speed settings."""
+        return [
+            speed
+            for speed in self.do(Actions.getSupportedShutterSpeed)
+            if speed != "BULB"
+        ]
+
+    @property
     def shutter_speed(self):
         """float: The camera's shutter speed in seconds."""
         shutter_speed = self.do(Actions.getShutterSpeed)
         if shutter_speed == "BULB":
-            # TODO handle bulb and use bulb for odd exposure lengths
-            return shutter_speed
+            # BULB is not supported by Sony's API :( set to longest exposure
+            shutter_speed = self.shutter_speeds[0]
+            self.shutter_speed = shutter_speed
 
-        self._shutter_speed = float(Fraction(shutter_speed.strip('"')))
+        else:
+            self._shutter_speed = float(Fraction(shutter_speed.strip('"')))
 
         return self._shutter_speed
 
@@ -145,7 +161,11 @@ class SonyCamera(SonyCameraAPI, Camera):
             else:
                 shutter_speed = str(shutter_speed) + '"'
 
-        elif not isinstance(shutter_speed, str):
+        elif isinstance(shutter_speed, str):
+            if shutter_speed == "BULB":
+                shutter_speed = self.shutter_speeds[0]
+
+        else:
             return
 
         if self.do(Actions.setShutterSpeed, shutter_speed) == 0:
