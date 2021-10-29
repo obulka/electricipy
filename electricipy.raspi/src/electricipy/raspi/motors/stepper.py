@@ -29,8 +29,8 @@ from ..gpio_controller import GPIOController, GPIOManager
 class StepperMotorController(GPIOController):
     """ Base class for control of stepper motors. """
 
-    MICROSTEPS = {}
-    FULL_STEPS_PER_TURN = None
+    _MICROSTEPS = {}
+    _FULL_STEPS_PER_TURN = None
 
     def __init__(
             self,
@@ -110,10 +110,10 @@ class StepperMotorController(GPIOController):
         Raises:
             ValueError: If the number of microsteps is invalid.
         """
-        if microsteps not in self.MICROSTEPS:
+        if microsteps not in self._MICROSTEPS:
             raise ValueError(
                 f"Invalid number of microsteps: {microsteps}\n"
-                f"Valid options are {self.MICROSTEPS.keys()}"
+                f"Valid options are {self._MICROSTEPS.keys()}"
             )
 
     def _initialize_gpio(self):
@@ -122,7 +122,7 @@ class StepperMotorController(GPIOController):
         self._pi.set_mode(self._direction_pin, pigpio.OUTPUT)
         self._pi.write(self._direction_pin, self._counterclockwise)
 
-        microstep_pin_values = self.MICROSTEPS[self._microsteps]
+        microstep_pin_values = self._MICROSTEPS[self._microsteps]
         for pin, pin_value in zip(self._microstep_pins, microstep_pin_values):
             self._pi.set_mode(pin, pigpio.OUTPUT)
             self._pi.write(pin, pin_value)
@@ -203,7 +203,7 @@ class StepperMotorController(GPIOController):
         Returns:
             int: The equivalent number of steps.
         """
-        return round(self.FULL_STEPS_PER_TURN * self._microsteps * angle / 360.)
+        return round(self._FULL_STEPS_PER_TURN * self._microsteps * angle / 360.)
 
     def _angular_speed_to_step_speed(self, speed):
         """ Convert a speed in degrees/second to steps/second.
@@ -214,7 +214,7 @@ class StepperMotorController(GPIOController):
         Returns:
             float: The equivalent speed in steps/second.
         """
-        return self.FULL_STEPS_PER_TURN * self._microsteps * speed / 360.
+        return self._FULL_STEPS_PER_TURN * self._microsteps * speed / 360.
 
     def _angular_speed_to_step_delay(self, speed):
         """ Convert a speed in degrees/second to the step delay
@@ -267,14 +267,14 @@ class StepperMotorController(GPIOController):
 class TMC2209(StepperMotorController):
     """ Control a stepper motor using a TMC2209 v1.2 control board """
 
-    MICROSTEPS = {
+    _MICROSTEPS = {
         8: (False, False),
         32: (False, True),
         64: (True, False),
         16: (True, True),
     }
 
-    FULL_STEPS_PER_TURN = 200
+    _FULL_STEPS_PER_TURN = 200
 
     def __init__(
             self,
