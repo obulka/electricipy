@@ -18,7 +18,7 @@ limitations under the License.
 import time
 
 # Local Imports
-from electricipy.raspi.motors import servo, stepper
+from electricipy.raspi.motors import servo, stepper, brushless
 
 
 def stepper_test():
@@ -41,31 +41,39 @@ def stepper_test():
     motor_manager.move_by_angles_in_times([-700, 700], [6, 6])
     motor_manager.move_by_angles_in_times([700, -700], [6, 6])
 
+
 def servo_test():
     """"""
-    servo_manager = servo.ServoMotorManager.sg90_manager([19])
-    # servo_manager = servo.ServoMotorManager.hk15148b_manager([19])
+    # servo_manager = servo.ServoMotorManager.sg90_manager([19])
+    servo_manager = servo.ServoMotorManager.hk15148b_manager([19])
 
     try:
         while True:
-            servo_manager[0].max()
-            time.sleep(2)
-            servo_manager[0].mid()
-            time.sleep(2)
             servo_manager[0].min()
             time.sleep(2)
             servo_manager[0].mid()
             time.sleep(2)
-
+            # servo_manager[0].min()
+            # time.sleep(2)
+            # servo_manager[0].mid()
+            # time.sleep(2)
 
     except KeyboardInterrupt:
         print("Program stopped")
+
+
+def esc_test():
+    """"""
+    esc = brushless.ElectronicSpeedController(19)
+    esc.arm()
+    esc.run_at_pulse_width_for_time(1000, 1)
+
 
 def main():
     """ Script to test development """
     start_time = time.time()
 
-    servo_test()
+    esc_test()
 
     print("--- %s seconds ---" % (time.time() - start_time))
 
