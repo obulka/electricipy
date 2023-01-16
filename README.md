@@ -65,7 +65,7 @@ enable_pins = [4, 17]
 microstep_pins = [[15, 14], [24, 23]]
 microsteps = [64, 64]
 
-motor_manager = stepper.TMC2209(
+motor = stepper.TMC2209(
     step_pins,
     direction_pins,
     enable_pins,
