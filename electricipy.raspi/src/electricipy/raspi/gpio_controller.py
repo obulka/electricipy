@@ -81,3 +81,9 @@ class GPIOManager:
                 The controllers to manage.
         """
         self._controllers = controllers
+
+    def __getitem__(self, index):
+        return self._controllers[index]
+
+    def __len__(self):
+        return len(self._controllers)
