@@ -59,11 +59,11 @@ This example rotates the motor ccw at 1Hz for 1min, then rotates it cw a quarter
 ```python
 from electricipy.raspi.motors import stepper
 
-step_pins = [18, 13]
-direction_pins = [3, 27]
-enable_pins = [4, 17]
-microstep_pins = [[15, 14], [24, 23]]
-microsteps = [64, 64]
+step_pin = 18
+direction_pin = 3
+enable_pin = 4
+microstep_pins = [15, 14]
+microsteps = 64
 
 motor = stepper.TMC2209(
     step_pins,
