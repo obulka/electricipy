@@ -39,14 +39,8 @@ def main():
 
     start_time = time.time()
 
-    # motor.move_at_speed_for_time(360, 60)
-
-    motor_manager.asynch_motor_command(0, "move_by_angle_in_time", 360, 1)
-    motor_manager.asynch_motor_command(1, "move_by_angle_in_time", 360, 1)
-    motor_manager.asynch_motor_command(0, "move_by_angle_in_time", -360, 1)
-    motor_manager.asynch_motor_command(1, "move_by_angle_in_time", -360, 1)
-    motor_manager.asynch_motor_command(0, "move_by_angle_in_time", 720, 1)
-    motor_manager.asynch_motor_command(1, "move_by_angle_in_time", 720, 1)
+    motor_manager.move_by_angles_in_times([-700, 700], [6, 6])
+    motor_manager.move_by_angles_in_times([700, -700], [6, 6])
 
     print("--- %s seconds ---" % (time.time() - start_time))
 

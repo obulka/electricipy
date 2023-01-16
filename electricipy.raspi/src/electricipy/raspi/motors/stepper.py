@@ -192,7 +192,7 @@ class StepperMotorController(GPIOController):
             while self._pi.wave_tx_busy():
                 if self._stop:
                     break
-                time.sleep(0.01)
+                time.sleep(2 * step_delay)
 
     def _angle_to_steps(self, angle):
         """ Convert a number of degrees to the closest number of steps.
@@ -244,23 +244,23 @@ class StepperMotorController(GPIOController):
 
         self.step(steps, step_delay)
 
-    def move_by_angle_in_time(self, angle, seconds):
+    def move_by_angle_in_time(self, angle, time):
         """ Move the motor a number of degrees in a period of time.
 
         Args:
             angle (float): Number of degrees to move.
             time (float): Time in which to move the motor by degrees.
         """
-        self.move_by_angle_at_speed(angle, angle / seconds)
+        self.move_by_angle_at_speed(angle, angle / time)
 
-    def move_at_speed_for_time(self, speed, seconds):
+    def move_at_speed_for_time(self, speed, time):
         """ Move the motor a number of degrees in a period of time.
 
         Args:
             speed (float): Speed in degrees/second to move at.
             time (float): Time to move the motor for in seconds.
         """
-        self.move_by_angle_at_speed(speed * seconds, speed)
+        self.move_by_angle_at_speed(speed * time, speed)
 
 
 
@@ -312,7 +312,7 @@ class TMC2209(StepperMotorController):
         """
         if len(microstep_pins) > 2:
             raise ValueError(
-                "Too many microstep pins specified, there are only two."
+                "Too many microstep pins specified, there are only two.",
             )
 
         self._check_microstep_value(microsteps)
@@ -397,6 +397,32 @@ class StepperMotorManager(GPIOManager):
             )
         return cls(motors)
 
-    def asynch_motor_command(self, motor_index, command, *args, **kwargs):
-        """ NOT IMPLEMENTED, TODO"""
-        getattr(self._controllers[motor_index], command)(*args, **kwargs)
+    def move_by_angles_at_speeds(self, angles, speeds):
+        """ Move the motor a number of degrees at a speed.
+
+        Args:
+            angles (list(float)): Number of degrees to move.
+            speeds (list(float)): Speeds in degrees/second to move at.
+        """
+        for motor_controller, angle, speed in zip(self._controllers, angles, speeds):
+            motor_controller.move_by_angle_at_speed(angle, speed)
+
+    def move_by_angles_in_times(self, angles, times):
+        """ Move the motor a number of degrees in a period of time.
+
+        Args:
+            angles (float): Number of degrees to move.
+            times (float): Time in which to move the motor by degrees.
+        """
+        for motor_controller, angle, time in zip(self._controllers, angles, times):
+            motor_controller.move_by_angle_in_time(angle, time)
+
+    def move_at_speeds_for_times(self, speeds, times):
+        """ Move the motor a number of degrees in a period of time.
+
+        Args:
+            speeds (float): Speed in degrees/second to move at.
+            times (float): Time to move the motor for in seconds.
+        """
+        for motor_controller, speed, time in zip(self._controllers, speeds, times):
+            motor_controller.move_at_speed_for_time(speed, time)
