@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 # Standard Imports
+import os
 import time
 
 # Local Imports
@@ -44,19 +45,28 @@ def stepper_test():
 
 def servo_test():
     """"""
-    # servo_manager = servo.ServoMotorManager.sg90_manager([19])
-    servo_manager = servo.ServoMotorManager.hk15148b_manager([19])
+    servo_manager = servo.ServoMotorManager.sg90_manager([19])
+    # servo_manager = servo.ServoMotorManager.hk15148b_manager([19])
 
     try:
         while True:
-            servo_manager[0].min()
-            time.sleep(2)
-            servo_manager[0].mid()
-            time.sleep(2)
-            # servo_manager[0].min()
-            # time.sleep(2)
-            # servo_manager[0].mid()
-            # time.sleep(2)
+            with servo_manager[0]:
+                servo_manager[0].angle = 10
+                time.sleep(2)
+                servo_manager[0].angle = -10
+                time.sleep(2)
+                servo_manager[0].angle = 20
+                time.sleep(2)
+                servo_manager[0].angle = -20
+                time.sleep(2)
+                servo_manager[0].max()
+                time.sleep(2)
+                servo_manager[0].mid()
+                time.sleep(2)
+                servo_manager[0].min()
+                time.sleep(2)
+                servo_manager[0].mid()
+                time.sleep(2)
 
     except KeyboardInterrupt:
         print("Program stopped")
@@ -65,15 +75,21 @@ def servo_test():
 def esc_test():
     """"""
     esc = brushless.ElectronicSpeedController(19)
-    esc.arm()
-    esc.run_at_pulse_width_for_time(1000, 1)
+    with esc:
+        esc.initialise()
+        print("initialised")
+        esc.mid()
+        # esc.max()
+        time.sleep(0.1)
 
 
 def main():
     """ Script to test development """
     start_time = time.time()
 
+    # stepper_test()
     esc_test()
+    # servo_test()
 
     print("--- %s seconds ---" % (time.time() - start_time))
 
