@@ -17,8 +17,8 @@ limitations under the License.
 from time import sleep
 
 # Local Imports
-from ..signals.pwm import PWMController
-from ..gpio_controller import GPIOManager
+from electricipy.raspi.signals.pwm import PWMController
+from electricipy.raspi.gpio_controller import GPIOManager
 
 
 class ServoController(PWMController):

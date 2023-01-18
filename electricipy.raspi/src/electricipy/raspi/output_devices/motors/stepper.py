@@ -23,7 +23,7 @@ import time
 import pigpio
 
 # Local Imports
-from ..gpio_controller import GPIOController, GPIOManager
+from electricipy.raspi.gpio_controller import GPIOController, GPIOManager
 
 
 class StepperMotorController(GPIOController):

@@ -19,7 +19,8 @@ import os
 import time
 
 # Local Imports
-from electricipy.raspi.motors import servo, stepper, brushless
+from electricipy.raspi.input_devices.switch import Switch
+from electricipy.raspi.output_devices.motors import servo, stepper, brushless
 
 
 def stepper_test():
@@ -83,13 +84,23 @@ def esc_test():
         time.sleep(0.1)
 
 
+def switch_test():
+    """"""
+    switch = Switch(5, True, pin_high=True)
+
+    while True:
+        time.sleep(1)
+        print(switch.pressed)
+
+
 def main():
     """ Script to test development """
     start_time = time.time()
 
     # stepper_test()
-    esc_test()
+    # esc_test()
     # servo_test()
+    switch_test()
 
     print("--- %s seconds ---" % (time.time() - start_time))
 
