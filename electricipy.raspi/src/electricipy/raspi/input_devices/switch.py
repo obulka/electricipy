@@ -38,7 +38,7 @@ class Switch(GPIOController):
 
         Keyword Args:
             pin_high (bool):
-                If the True, then connect one side of the switch to the
+                If True, then connect one side of the switch to the
                 specified pin and the other to ground through a load.
                 Otherwise, connect one side to the specified pin and the
                 other to 3.3V through a load.
@@ -64,15 +64,12 @@ class Switch(GPIOController):
 
     def _on_rising_edge(self, pin, level, tick):
         """"""
-        print("_on_rising_edge", pin, level, tick, self.pressed)
 
     def _on_falling_edge(self, pin, level, tick):
         """"""
-        print("_on_falling_edge", pin, level, tick, self.pressed)
 
     def _on_either_edge(self, pin, level, tick):
         """"""
-        print("_on_either_edge", pin, level, tick, self.pressed)
 
     @property
     def _pin_state(self):
@@ -83,3 +80,38 @@ class Switch(GPIOController):
     def pressed(self):
         """bool: Whether or not the switch is currently pressed."""
         return self._pin_state ^ self._pin_high
+
+
+class EmergencyStop(Switch):
+    """"""
+
+    def __init__(self, pin, device, pin_high=True, pi_connection=None):
+        """ Initialise the switch.
+
+        Args:
+            pin (int): The pin the switch is connected to.
+            device (GPIOController): The device to stop if this switch
+                is pressed.
+
+        Keyword Args:
+            pin_high (bool):
+                If True, then connect one side of the switch to the
+                specified pin and the other to ground through a load.
+                Otherwise, connect one side to the specified pin and the
+                other to 3.3V through a load.
+            pi_connection (pigpio.pi):
+                The connection to the raspberry pi. If not specified, we
+                assume the code is running on a pi and use the local
+                gpio.
+        """
+        super().__init__(
+            pin,
+            False,
+            pin_high=pin_high,
+            pi_connection=pi_connection,
+        )
+        self._device = device
+
+    def _on_either_edge(self, _, _, _):
+        """"""
+        self._device.stop()

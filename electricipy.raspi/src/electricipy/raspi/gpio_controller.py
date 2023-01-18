@@ -68,6 +68,7 @@ class GPIOController:
     def stop(self):
         """ Stops the current routine immediately. """
         self._stop = True
+        self._cleanup_gpio()
 
 
 class GPIOManager:
