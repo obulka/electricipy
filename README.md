@@ -57,7 +57,8 @@ There is a command line tool named 'timelapse' that can be used to easily connec
 This example rotates the motor ccw at 1Hz for 1min, then rotates it cw a quarter turn in 15s, and finally completes a full ccw rotation in 1s. This assumes you are using a TMC2209 stepper motor driver and have it hooked up to the specified pins. Note that a negative angle will rotate clockwise, but not a negative speed (it's not velocity!) Motor control is a work in progress.
 
 ```python
-from electricipy.raspi.motors import stepper
+from electricipy.raspi.output_devices.motors import stepper
+
 
 step_pin = 18
 direction_pin = 3
@@ -76,6 +77,50 @@ motor = stepper.TMC2209(
 motor.move_at_speed_for_time(360, 60)
 motor.move_by_angle_in_time(-90, 15)
 motor.move_by_angle_at_speed(360, 360)
+```
+
+### Servo control
+
+```python
+import time
+
+from electricipy.raspi.output_devices.motors.servo import SG90
+
+
+servo_pin = 19
+servo = AngularServoController(servo_pin)
+
+with servo:
+    servo.angle = 20
+    time.sleep(2)
+    servo.angle = -20
+    time.sleep(2)
+    servo.max()
+    time.sleep(2)
+    servo.mid()
+    time.sleep(2)
+    servo.min()
+    time.sleep(2)
+
+```
+
+### Electronic Speed Controller Driving Brushless Motors
+
+```python
+import time
+
+from electricipy.raspi.output_devices.motors import brushless
+
+
+esc_pin = 19
+esc = brushless.ElectronicSpeedController(esc_pin)
+with esc:
+    esc.initialise()
+    print("initialised")
+    esc.mid()
+    # esc.max()
+    time.sleep(1)
+
 ```
 
 ## Documentation
