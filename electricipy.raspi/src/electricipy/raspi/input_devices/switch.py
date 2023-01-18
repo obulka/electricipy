@@ -85,13 +85,13 @@ class Switch(GPIOController):
 class EmergencyStop(Switch):
     """"""
 
-    def __init__(self, pin, device, pin_high=True, pi_connection=None):
+    def __init__(self, pin, devices, pin_high=True, pi_connection=None):
         """ Initialise the switch.
 
         Args:
             pin (int): The pin the switch is connected to.
-            device (GPIOController): The device to stop if this switch
-                is pressed.
+            devices (list(GPIOController)): The devices to stop if this
+                switch is pressed.
 
         Keyword Args:
             pin_high (bool):
@@ -110,8 +110,9 @@ class EmergencyStop(Switch):
             pin_high=pin_high,
             pi_connection=pi_connection,
         )
-        self._device = device
+        self._devices = devices
 
     def _on_either_edge(self, _, _, _):
         """"""
-        self._device.stop()
+        for device in self._devices:
+            device.stop()
