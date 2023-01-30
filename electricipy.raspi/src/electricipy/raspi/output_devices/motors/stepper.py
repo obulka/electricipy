@@ -23,10 +23,13 @@ import time
 import pigpio
 
 # Local Imports
-from electricipy.raspi.gpio_controller import GPIOController, GPIOManager
+from electricipy.raspi.gpio_controller import GPIOManager
+
+from .. import OutputController
+from ..signals.waves import SquareWave
 
 
-class StepperMotorController(GPIOController):
+class StepperMotorController(OutputController):
     """ Base class for control of stepper motors. """
 
     _MICROSTEPS = {}
@@ -36,8 +39,10 @@ class StepperMotorController(GPIOController):
             self,
             step_pin,
             direction_pin,
-            microstep_pins=(),
+            microstep_pins,
             microsteps=1,
+            gear_ratio=1.,
+            pitch=None,
             pi_connection=None):
         """ Stepper motor control class.
 
@@ -46,31 +51,38 @@ class StepperMotorController(GPIOController):
         Args:
             step_pin (int): The step pin number to use.
             direction_pin (int): The direction pin number to use.
-
-        Keyword Args:
             microstep_pins (tuple(int,)): The pin numbers for the
                 microstep settings. (MS2, MS1)
+
+        Keyword Args:
+
             microsteps (int):
                 The number of microsteps to perform. If you have hard
                 wired the microstep pins you must pass the number of
                 microsteps you have set it to in order for thecontroller
                 to operate correctly. The default 1 microstep means the
                 motor is taking full steps.
+            gear_ratio (float): TODO
+            pitch (float): TODO
             pi_connection (pigpio.pi):
                 The connection to the raspberry pi. If not specified, we
                 assume the code is running on a pi and use the local
                 gpio.
         """
-        super().__init__(pi_connection=pi_connection)
-
         self._step_pin = step_pin
         self._direction_pin = direction_pin
         self._microstep_pins = microstep_pins
 
+        pins = (self._step_pin, self._direction_pin)
+        for pin in self._microstep_pins:
+            pins += pin
+
+        super().__init__(pins=pins, pi_connection=pi_connection)
+
         self._microsteps = microsteps
 
         self._counterclockwise = True
-        self._wave_id = None
+        self._wave = None
 
     @property
     def counterclockwise(self):
@@ -118,76 +130,38 @@ class StepperMotorController(GPIOController):
 
     def _initialize_gpio(self):
         """ Initialize the GPIO pins. """
-        self._pi.set_mode(self._step_pin, pigpio.OUTPUT)
-        self._pi.set_mode(self._direction_pin, pigpio.OUTPUT)
+        super()._initialize_gpio()
+
         self._pi.write(self._direction_pin, self._counterclockwise)
 
         microstep_pin_values = self._MICROSTEPS[self._microsteps]
         for pin, pin_value in zip(self._microstep_pins, microstep_pin_values):
-            self._pi.set_mode(pin, pigpio.OUTPUT)
             self._pi.write(pin, pin_value)
 
     def _cleanup_gpio(self):
         """ Reset all pins to low to cleanup. """
-        if self._wave_id is not None:
-            self._pi.wave_delete(self._wave_id)
-            self._wave_id = None
-
-        self._pi.write(self._step_pin, False)
         self._pi.write(self._direction_pin, False)
 
         for pin in self._microstep_pins:
             self._pi.write(pin, False)
 
-    def step(self, num_steps, step_delay=5e-4):
+    def step(self, num_steps, step_period=1e-3):
         """ Step the motor a number of times.
 
         Args:
             num_steps (int): Number of steps to perform.
 
         Keyword Args:
-            step_delay (float): The time for which the pulse is high.
-                Therefore one step will take 2 * step_delay seconds.
+            step_period (float): The period at which to drive the steps.
+                One step will take step_period seconds to complete.
         """
-        with self:
-            microsecond_step_delay = round(1e6 * step_delay)
-
-            self._pi.wave_add_generic([
-                pigpio.pulse(1 << self._step_pin, 0, microsecond_step_delay),
-                pigpio.pulse(0, 1 << self._step_pin, microsecond_step_delay),
-            ])
-
-            self._wave_id = self._pi.wave_create()
-
-            full_loop_denominator = 256 * 255 + 255
-            num_full_loops = num_steps // full_loop_denominator
-
-            if num_full_loops > full_loop_denominator:
-                raise ValueError("Too many steps for waveform.")
-
-            full_loop_remainder = num_steps % full_loop_denominator
-
-            final_multiple = full_loop_remainder // 256
-            final_remainder = full_loop_remainder % 256
-
-            wave_chain = [
-                255, 0,
-                    255, 0,
-                        self._wave_id,
-                    255, 1,
-                    255, 255,
-                255, 1,
-                num_full_loops % 256, num_full_loops // 256,
-            ]
-            wave_chain.extend([
-                255, 0,                          # Start loop
-                    self._wave_id,               # Create wave
-                255, 1,                          # loop end
-                final_remainder, final_multiple, # repeat step_remainder + 256 * step_multiple
-            ])
-
-            self._pi.wave_chain(wave_chain)
-
+        self._wave = SquareWave(
+            self._step_pin,
+            num_steps,
+            pi_connection=self._pi,
+            period=step_period,
+        )
+        with (self, self._wave):
             # Wait for wave to finish transmission
             while self._pi.wave_tx_busy():
                 if self._stop:
@@ -216,9 +190,9 @@ class StepperMotorController(GPIOController):
         """
         return self._FULL_STEPS_PER_TURN * self._microsteps * speed / 360.
 
-    def _angular_speed_to_step_delay(self, speed):
+    def _angular_speed_to_step_period(self, speed):
         """ Convert a speed in degrees/second to the step delay
-        (half pulse period).
+        (pulse period).
 
         Args:
             speed (float): The speed in degrees/second.
@@ -226,7 +200,7 @@ class StepperMotorController(GPIOController):
         Returns:
             float: The equivalent pulse time in seconds.
         """
-        return 1 / (4 * self._angular_speed_to_step_speed(speed))
+        return 1 / (2 * self._angular_speed_to_step_speed(speed))
 
     def move_by_angle_at_speed(self, angle, speed):
         """ Move the motor a number of degrees at a speed.
@@ -240,9 +214,9 @@ class StepperMotorController(GPIOController):
         else:
             self.counterclockwise = True
         steps = self._angle_to_steps(abs(angle))
-        step_delay = self._angular_speed_to_step_delay(abs(speed))
+        step_period = self._angular_speed_to_step_period(abs(speed))
 
-        self.step(steps, step_delay)
+        self.step(steps, step_period)
 
     def move_by_angle_in_time(self, angle, time):
         """ Move the motor a number of degrees in a period of time.
@@ -390,7 +364,7 @@ class StepperMotorManager(GPIOManager):
                     step_pin,
                     dir_pin,
                     enable_pin,
-                    microstep_pins=microstep_pin,
+                    microstep_pin,
                     microsteps=microstep,
                     pi_connection=pi_connection,
                 )

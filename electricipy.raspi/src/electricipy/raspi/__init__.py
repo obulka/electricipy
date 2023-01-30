@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 __all__ = [
-    "motors",
-    "signals",
+    "output_devices",
+    "input_devices",
     "gpio_controller",
 ]

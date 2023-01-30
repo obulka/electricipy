@@ -22,10 +22,10 @@ from time import sleep
 import pigpio
 
 # Local Imports
-from electricipy.raspi.gpio_controller import GPIOController
+from .. import InputController
 
 
-class Switch(GPIOController):
+class Switch(InputController):
     """Base switch class"""
 
     def __init__(self, pin, normally_open, pin_high=True, pi_connection=None):
@@ -47,20 +47,19 @@ class Switch(GPIOController):
                 assume the code is running on a pi and use the local
                 gpio.
         """
-        super().__init__(pi_connection=pi_connection)
+        super().__init__(pins=(pin,), pi_connection=pi_connection)
 
-        self._pin = pin
         self._pin_high = pin_high
         self._normally_open = normally_open
 
         self._pi.set_pull_up_down(
-            self._pin,
+            self.pin,
             pigpio.PUD_UP if self._pin_high else pigpio.PUD_DOWN,
         )
 
-        self._pi.callback(self._pin, pigpio.FALLING_EDGE, self._on_falling_edge)
-        self._pi.callback(self._pin, pigpio.RISING_EDGE, self._on_rising_edge)
-        self._pi.callback(self._pin, pigpio.EITHER_EDGE, self._on_either_edge)
+        self._pi.callback(self.pin, pigpio.FALLING_EDGE, self._on_falling_edge)
+        self._pi.callback(self.pin, pigpio.RISING_EDGE, self._on_rising_edge)
+        self._pi.callback(self.pin, pigpio.EITHER_EDGE, self._on_either_edge)
 
     def _on_rising_edge(self, pin, level, tick):
         """"""
@@ -72,9 +71,13 @@ class Switch(GPIOController):
         """"""
 
     @property
+    def pin(self):
+        return self._pins[0]
+
+    @property
     def _pin_state(self):
         """bool: Whether or not the pin value is currently high."""
-        return bool(self._pi.read(self._pin))
+        return bool(self._pi.read(self.pin))
 
     @property
     def pressed(self):

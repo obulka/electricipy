@@ -23,10 +23,11 @@ import pigpio
 class GPIOController:
     """ Base class for gpio control. """
 
-    def __init__(self, pi_connection=None):
+    def __init__(self, pins=None, pi_connection=None):
         """ Initialize the controller.
 
         Keyword Args:
+            pins (tuple(int)): The pins to control.
             pi_connection (pigpio.pi):
                 The connection to the raspberry pi. If not specified, we
                 assume the code is running on a pi and use the local
@@ -40,6 +41,7 @@ class GPIOController:
         if not self._pi.connected:
             raise ValueError("Unable to connect to a raspberry pi.")
 
+        self._pins = pins
         self._stop = False
 
     def __enter__(self):

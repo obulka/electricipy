@@ -21,8 +21,7 @@ from time import sleep
 import pigpio
 
 # Local Imports
-from electricipy.raspi.signals.pwm import PWMController
-from electricipy.raspi.gpio_controller import GPIOController, GPIOManager
+from ..signals.pwm import PWMController
 
 
 class ElectronicSpeedController(PWMController):

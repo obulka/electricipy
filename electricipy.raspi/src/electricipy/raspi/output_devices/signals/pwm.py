@@ -23,10 +23,10 @@ from time import sleep
 import pigpio
 
 # Local Imports
-from electricipy.raspi.gpio_controller import GPIOController
+from .. import OutputController
 
 
-class PWMController(GPIOController):
+class PWMController(OutputController):
     """"""
 
     def __init__(
@@ -36,14 +36,16 @@ class PWMController(GPIOController):
             max_pulse_width=2500,
             initial_pulse_width=1500,
             pi_connection=None):
-        super(PWMController, self).__init__(pi_connection=pi_connection)
-
-        self._pin = pin
+        super().__init__(pins=(pin,), pi_connection=pi_connection)
 
         self._min_pulse_width = min_pulse_width
         self._max_pulse_width = max_pulse_width
 
         self._pulse_width = initial_pulse_width
+
+    @property
+    def pin(self):
+        return self._pins[0]
 
     @property
     def pulse_width(self):
@@ -59,15 +61,17 @@ class PWMController(GPIOController):
 
     def _initialize_gpio(self):
         """ Initialize the GPIO pins. """
-        self._pi.set_servo_pulsewidth(self._pin, 0)
+        super()._initialize_gpio()
+
+        self._pi.set_servo_pulsewidth(self.pin, 0)
 
     def _cleanup_gpio(self):
         """ Reset all pins to cleanup. """
-        self._pi.set_servo_pulsewidth(self._pin, 0)
+        self._pi.set_servo_pulsewidth(self.pin, 0)
 
     def start(self):
         """"""
-        self._pi.set_servo_pulsewidth(self._pin, self._pulse_width)
+        self._pi.set_servo_pulsewidth(self.pin, self._pulse_width)
 
     def min(self):
         """"""
