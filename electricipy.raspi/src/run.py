@@ -97,10 +97,10 @@ def main():
     """ Script to test development """
     start_time = time.time()
 
-    # stepper_test()
+    stepper_test()
     # esc_test()
     # servo_test()
-    switch_test()
+    # switch_test()
 
     print("--- %s seconds ---" % (time.time() - start_time))
 

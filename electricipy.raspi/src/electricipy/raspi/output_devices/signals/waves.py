@@ -4,10 +4,10 @@
 import pigpio
 
 # Local Imports
-from electricipy.raspi.gpio_controller import GPIOController
+from .. import OutputController
 
 
-class WaveForm(GPIOController):
+class WaveForm(OutputController):
     """"""
 
     def __init__(self, pin, pi_connection=None, wave_id=None):
@@ -23,10 +23,13 @@ class WaveForm(GPIOController):
             ValueError:
                 If a raspberry pi connection cannot be established.
         """
-        super().__init__(pi_connection=pi_connection)
+        super().__init__(pins=(pin,), pi_connection=pi_connection)
 
-        self._pin = pin
         self._id = wave_id
+
+    @property
+    def pin(self):
+        return self._pins[0]
 
     @property
     def id(self):
@@ -34,8 +37,8 @@ class WaveForm(GPIOController):
 
     def _initialize_gpio(self):
         """ Initialize the GPIO pins. """
-        self._pi.set_mode(self._step_pin, pigpio.OUTPUT)
-        self._id = wave_id or self._pi.wave_create()
+        self._pi.set_mode(self.pin, pigpio.OUTPUT)
+        self._id = self._id or self._pi.wave_create()
 
     def _cleanup_gpio(self):
         """ Reset all pins to cleanup. """
@@ -44,7 +47,7 @@ class WaveForm(GPIOController):
             self._id = None
 
 
-class SquareWave(WaveForm)
+class SquareWave(WaveForm):
     """"""
 
     def __init__(
@@ -66,37 +69,47 @@ class SquareWave(WaveForm)
 
         microsecond_pulse_time = round(1e6 * period / 2)
 
+        self._num_cycles = num_cycles
+
+        self._wave_pulses = [
+            pigpio.pulse(1 << self.pin, 0, microsecond_pulse_time),
+            pigpio.pulse(0, 1 << self.pin, microsecond_pulse_time),
+        ]
+
+    def _create_wave_chain(self):
+        """"""
         full_loop_denominator = 256 * 255 + 255
-        num_full_loops = num_cycles // full_loop_denominator
+        num_full_loops = self._num_cycles // full_loop_denominator
 
         if num_full_loops > full_loop_denominator:
             raise ValueError("Too many steps for individual waveform.")
 
-        full_loop_remainder = num_cycles % full_loop_denominator
+        full_loop_remainder = self._num_cycles % full_loop_denominator
 
         final_multiple = full_loop_remainder // 256
         final_remainder = full_loop_remainder % 256
 
-        self._wave_pulses = [
-            pigpio.pulse(1 << self._pin, 0, microsecond_pulse_time),
-            pigpio.pulse(0, 1 << self._pin, microsecond_pulse_time),
-        ]
-
-        self._wave_chain = [
+        # This is formatted a bit strange because the contents of the following
+        # list are a sort of simple programming language, with integers
+        # representing for loops, so I have indented them as if they were
+        # a language
+        wave_chain = [
             255, 0,
                 255, 0,
-                    self._wave_id,
+                    self._id,
                 255, 1,
                 255, 255,
             255, 1,
             num_full_loops % 256, num_full_loops // 256,
         ]
-        self._wave_chain.extend([
+        wave_chain.extend([
             255, 0,                          # Start loop
-                self._wave_id,               # Create wave
+                self._id,                    # Create wave
             255, 1,                          # loop end
             final_remainder, final_multiple, # repeat step_remainder + 256 * step_multiple
         ])
+
+        return wave_chain
 
     def _initialize_gpio(self):
         """ Initialize the GPIO pins. """
@@ -104,4 +117,4 @@ class SquareWave(WaveForm)
 
         super()._initialize_gpio()
 
-        self._pi.wave_chain(self._wave_chain)
+        self._pi.wave_chain(self._create_wave_chain())

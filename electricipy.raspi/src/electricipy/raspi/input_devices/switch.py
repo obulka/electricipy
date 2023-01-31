@@ -22,7 +22,7 @@ from time import sleep
 import pigpio
 
 # Local Imports
-from .. import InputController
+from . import InputController
 
 
 class Switch(InputController):
@@ -115,7 +115,7 @@ class EmergencyStop(Switch):
         )
         self._devices = devices
 
-    def _on_either_edge(self, _, _, _):
+    def _on_either_edge(self, pin, level, tick):
         """"""
         for device in self._devices:
             device.stop()

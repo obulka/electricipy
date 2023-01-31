@@ -75,7 +75,7 @@ class StepperMotorController(OutputController):
 
         pins = (self._step_pin, self._direction_pin)
         for pin in self._microstep_pins:
-            pins += pin
+            pins += (pin,)
 
         super().__init__(pins=pins, pi_connection=pi_connection)
 
@@ -161,12 +161,12 @@ class StepperMotorController(OutputController):
             pi_connection=self._pi,
             period=step_period,
         )
-        with (self, self._wave):
+        with self, self._wave:
             # Wait for wave to finish transmission
             while self._pi.wave_tx_busy():
                 if self._stop:
                     break
-                time.sleep(2 * step_delay)
+                time.sleep(step_period)
 
     def _angle_to_steps(self, angle):
         """ Convert a number of degrees to the closest number of steps.

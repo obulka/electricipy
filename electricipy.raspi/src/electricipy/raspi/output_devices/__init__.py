@@ -1,10 +1,14 @@
+# 3rd Party Imports
+import pigpio
+
+# Local Imports
 from electricipy.raspi.gpio_controller import GPIOController
 
 
 class OutputController(GPIOController):
     """"""
 
-    def __init__(self, pins=pins, pi_connection=None):
+    def __init__(self, pins=None, pi_connection=None):
         """ Initialize the controller.
 
         Keyword Args:
