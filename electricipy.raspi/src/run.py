@@ -26,7 +26,7 @@ from electricipy.raspi.output_devices.motors import servo, stepper, brushless
 def stepper_test():
     """"""
     motor_drivers = (
-        TMC2209(
+        stepper.TMC2209(
             step_pin=18,
             direction_pin=3,
             enable_pin=4,
@@ -36,7 +36,7 @@ def stepper_test():
             linear=True,
             pitch=5e-3,
         ),
-        TMC2209(
+        stepper.TMC2209(
             step_pin=13,
             direction_pin=27,
             enable_pin=17,
@@ -47,10 +47,10 @@ def stepper_test():
         ),
     )
 
-    motor_manager = stepper.StepperMotorManager.tmc2209_manager(motors)
+    motor_controller = stepper.StepperMotorController(motor_drivers)
 
-    motor_manager.move_by_angles_in_times([-700, 700], [6, 6])
-    motor_manager.move_by_angles_in_times([700, -700], [6, 6])
+    motor_controller.move_by_angles_in_time([-700, 700], 6)
+    motor_controller.move_by_angles_in_time([700, -700], 6)
 
 
 def servo_test():

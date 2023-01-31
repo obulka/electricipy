@@ -18,7 +18,7 @@ This module contains stepper motor controls.
 """
 # Standard Imports
 from contextlib import ExitStack
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import time
 
 # 3rd Party Imports
@@ -31,7 +31,7 @@ from .. import OutputController
 from ..signals.waves import FiniteWaveFormManager, SquareWave
 
 
-@dataclass(kw_only=True)
+@dataclass
 class StepperMotorDriver:
     """ Class to store the data of a stepper motor.
 
@@ -191,7 +191,7 @@ class StepperMotorDriver:
         return 360. * distance / self.pitch
 
 
-@dataclass(kw_only=True)
+@dataclass
 class TMC2209(StepperMotorDriver):
     """ Control a stepper motor using a TMC2209 v1.2 control board """
     _MICROSTEPS = {
