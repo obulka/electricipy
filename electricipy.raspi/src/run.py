@@ -25,20 +25,29 @@ from electricipy.raspi.output_devices.motors import servo, stepper, brushless
 
 def stepper_test():
     """"""
-    step_pins = [18, 13]
-    direction_pins = [3, 27]
-    enable_pins = [4, 17]
-    microstep_pins = [[15, 14], [24, 23]]
-    microsteps = [64, 64]
-
-    motor_manager = stepper.StepperMotorManager.tmc2209_manager(
-        step_pins,
-        direction_pins,
-        enable_pins,
-        microstep_pins,
-        microsteps,
+    motor_drivers = (
+        TMC2209(
+            step_pin=18,
+            direction_pin=3,
+            enable_pin=4,
+            microstep_pins=(15, 14),
+            microsteps=64,
+            gear_ratio=1.,
+            linear=True,
+            pitch=5e-3,
+        ),
+        TMC2209(
+            step_pin=13,
+            direction_pin=27,
+            enable_pin=17,
+            microstep_pins=(24, 23),
+            microsteps=64,
+            gear_ratio=1.,
+            linear=False,
+        ),
     )
 
+    motor_manager = stepper.StepperMotorManager.tmc2209_manager(motors)
 
     motor_manager.move_by_angles_in_times([-700, 700], [6, 6])
     motor_manager.move_by_angles_in_times([700, -700], [6, 6])
@@ -95,6 +104,8 @@ def switch_test():
 
 def main():
     """ Script to test development """
+    # os.system("sudo pigpiod")
+
     start_time = time.time()
 
     stepper_test()

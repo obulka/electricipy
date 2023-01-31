@@ -16,6 +16,9 @@ limitations under the License.
 
 This module contains the base class for GPIO control.
 """
+# Standard Imports
+from contextlib import ExitStack
+
 # 3rd Party Imports
 import pigpio
 
@@ -61,6 +64,10 @@ class GPIOController:
         """
         self._cleanup_gpio()
 
+    @property
+    def pi(self):
+        return self._pi
+
     def _initialize_gpio(self):
         """ Initialize the GPIO pins. """
 
@@ -82,11 +89,45 @@ class GPIOManager:
         Args:
             controllers (list(GPIOController)):
                 The controllers to manage.
+
+        Raises:
+            ValueError: If no controllers are given to the manager.
         """
+        if not controllers:
+            raise ValueError("Manager must have at least one controller.")
+
         self._controllers = controllers
+        self._stop = False
+        self._stack = None
 
     def __getitem__(self, index):
         return self._controllers[index]
 
     def __len__(self):
         return len(self._controllers)
+
+    def __enter__(self):
+        """ Setup for whatever control routine the child implements. """
+        self._stop = False
+        with ExitStack() as stack:
+            for controller in self:
+                stack.enter_context(controller)
+            self._stack = stack.pop_all()
+
+    def __exit__(self, exception_type, exception_value, exception_traceback):
+        """ Exit and clean up after the routine.
+
+        Args:
+            exception_type (Exception): Indicates class of exception.
+            exception_value (str): Indicates the type of exception.
+            exception_traceback (traceback):
+                Report which has all of the information needed to solve
+                the exception.
+        """
+        self._stack.__exit__(exception_type, exception_value, exception_traceback)
+
+    def stop(self):
+        """ Stops the current routine immediately. """
+        self._stop = True
+        for controller in self:
+            controller.stop()
