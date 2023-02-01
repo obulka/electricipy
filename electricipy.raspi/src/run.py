@@ -49,8 +49,8 @@ def stepper_test():
 
     motor_controller = stepper.StepperMotorController(motor_drivers)
 
-    motor_controller.move_by_angles_in_time([-700, 700], 6)
-    motor_controller.move_by_angles_in_time([700, -700], 6)
+    motor_controller.move_by_angles_in_time([-720, 720], 6)
+    motor_controller.move_by_angles_in_time([720, -720], 6)
 
 
 def servo_test():
@@ -104,7 +104,7 @@ def switch_test():
 
 def main():
     """ Script to test development """
-    # os.system("sudo pigpiod")
+    # os.system("sudo pigpiod -t0")
 
     start_time = time.time()
 

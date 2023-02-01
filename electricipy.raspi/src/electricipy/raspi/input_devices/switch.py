@@ -47,7 +47,7 @@ class Switch(InputController):
                 assume the code is running on a pi and use the local
                 gpio.
         """
-        super().__init__(pins=(pin,), pi_connection=pi_connection)
+        super().__init__((pin,), pi_connection=pi_connection)
 
         self._pin_high = pin_high
         self._normally_open = normally_open

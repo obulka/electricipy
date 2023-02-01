@@ -36,7 +36,7 @@ class PWMController(OutputController):
             max_pulse_width=2500,
             initial_pulse_width=1500,
             pi_connection=None):
-        super().__init__(pins=(pin,), pi_connection=pi_connection)
+        super().__init__((pin,), pi_connection=pi_connection)
 
         self._min_pulse_width = min_pulse_width
         self._max_pulse_width = max_pulse_width

@@ -28,7 +28,7 @@ import pigpio
 from electricipy.raspi.gpio_controller import GPIOManager
 
 from .. import OutputController
-from ..signals.waves import FiniteWaveFormManager, SquareWave
+from ..signals.waves import FiniteWaveForm, PulseWaveController
 
 
 @dataclass
@@ -236,20 +236,21 @@ class StepperMotorController(OutputController):
         self._stepper_drivers = stepper_drivers
 
         pins = tuple()
-        for stepper_driver in self._stepper_drivers:
+        for stepper_driver in self:
             pins += stepper_driver.pins
 
-        super().__init__(pins=pins, pi_connection=pi_connection)
+        super().__init__(pins, pi_connection=pi_connection)
 
-        self._waves = None
+        self._stack = None
+        self._wave = None
 
     def __enter__(self):
         """ Setup for whatever control routine the child implements. """
         super().__enter__()
 
         with ExitStack() as stack:
-            if self._waves:
-                stack.enter_context(self._waves)
+            if self._wave:
+                stack.enter_context(self._wave)
 
             self._stack = stack.pop_all()
 
@@ -266,59 +267,51 @@ class StepperMotorController(OutputController):
         super().__exit__(exception_type, exception_value, exception_traceback)
         self._stack.__exit__(exception_type, exception_value, exception_traceback)
 
+    def __getitem__(self, index):
+        return self._stepper_drivers[index]
+
+    def __len__(self):
+        return len(self._stepper_drivers)
+
     def _initialize_gpio(self):
         """ Initialize the GPIO pins. """
         super()._initialize_gpio()
 
-        for driver in self._stepper_drivers:
-            self._pi.write(driver.direction_pin, driver.counterclockwise)
-            self._pi.write(driver.enable_pin, False)
+        for stepper_driver in self:
+            self._pi.write(stepper_driver.direction_pin, stepper_driver.counterclockwise)
+            self._pi.write(stepper_driver.enable_pin, False)
 
-            for pin, pin_value in zip(driver.microstep_pins, driver.microstep_pin_values):
+            for pin, pin_value in zip(
+                stepper_driver.microstep_pins,
+                stepper_driver.microstep_pin_values
+            ):
                 self._pi.write(pin, pin_value)
 
     def _cleanup_gpio(self):
         """ Reset all pins to low to cleanup. """
         super()._cleanup_gpio()
 
-        for driver in self._stepper_drivers:
-            self._pi.write(driver.direction_pin, False)
-            self._pi.write(driver.enable_pin, True)
+        for stepper_driver in self:
+            self._pi.write(stepper_driver.direction_pin, False)
+            self._pi.write(stepper_driver.enable_pin, True)
 
-            for pin in driver.microstep_pins:
+            for pin in stepper_driver.microstep_pins:
                 self._pi.write(pin, False)
 
     @property
     def waves(self):
-        return self._waves
-
-    def create_waves(self, num_steps, step_period=None):
-        """ Create a wave to step the motor a number of time.
-
-        Args:
-            num_steps (int): Number of steps to perform.
-
-        Keyword Args:
-            step_period (float): The period at which to drive the steps.
-                One step will take step_period seconds to complete.
-        """
-        self._waves = SquareWave(
-            self._step_pin,
-            num_steps,
-            pi_connection=self._pi,
-            period=step_period,
-        )
+        return self._wave
 
     def _run(self):
         """ Step the motor through the loaded wave function. """
         with self:
-            self._waves.run()
+            self._wave.run()
 
             # Wait for wave to finish transmission
             while self._pi.wave_tx_busy():
                 if self._stop:
                     break
-                time.sleep(self._waves.min_period)
+                time.sleep(self._wave.min_period)
 
     def prepare_to_move_by_angles_in_time(self, angles, time):
         """ Load the waveform required to move the motor a number of
@@ -328,17 +321,18 @@ class StepperMotorController(OutputController):
             angles (list(float)): Number of degrees to move.
             time (float): Time in seconds to move through the angle.
         """
-        for stepper_driver, angle in zip(self._stepper_drivers, angles):
+        wave_data = []
+        for stepper_driver, angle in zip(self, angles):
             if angle < 0:
                 stepper_driver.clockwise = True
             else:
                 stepper_driver.counterclockwise = True
 
             steps = stepper_driver.angle_to_steps(abs(angle))
-            step_period = time / steps
 
-            # TODO
-            self.create_waves(steps, step_period=step_period)
+            wave_data.append(FiniteWaveForm(stepper_driver.step_pin, steps))
+
+        self._wave = PulseWaveController(wave_data, time, pi_connection=self._pi)
 
     def prepare_to_move_at_speeds_for_time(self, speeds, time):
         """ Load the waveform required to move the motors a number of
@@ -362,7 +356,7 @@ class StepperMotorController(OutputController):
             time (float): Time to move the motor for in seconds.
         """
         angles = []
-        for stepper_driver, distance in zip(self._stepper_drivers, distances):
+        for stepper_driver, distance in zip(self, distances):
             if stepper_driver.linear:
                 angles.append(stepper_driver.distance_to_angle(distance))
             else:

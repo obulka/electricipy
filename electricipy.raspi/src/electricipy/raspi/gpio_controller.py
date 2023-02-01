@@ -26,11 +26,13 @@ import pigpio
 class GPIOController:
     """ Base class for gpio control. """
 
-    def __init__(self, pins=None, pi_connection=None):
+    def __init__(self, pins, pi_connection=None):
         """ Initialize the controller.
 
-        Keyword Args:
+        Args:
             pins (tuple(int)): The pins to control.
+
+        Keyword Args:
             pi_connection (pigpio.pi):
                 The connection to the raspberry pi. If not specified, we
                 assume the code is running on a pi and use the local
@@ -63,6 +65,12 @@ class GPIOController:
                 the exception.
         """
         self._cleanup_gpio()
+
+    def __getitem__(self, index):
+        return self._pins[index]
+
+    def __len__(self):
+        return len(self._pins)
 
     @property
     def pi(self):
@@ -99,12 +107,6 @@ class GPIOManager:
         self._controllers = controllers
         self._stop = False
         self._stack = None
-
-    def __getitem__(self, index):
-        return self._controllers[index]
-
-    def __len__(self):
-        return len(self._controllers)
 
     def __enter__(self):
         """ Setup for whatever control routine the child implements. """
