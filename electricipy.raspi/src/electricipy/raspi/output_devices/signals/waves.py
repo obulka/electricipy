@@ -162,6 +162,15 @@ class PulseWaveController(OutputController):
 
         pulse_cycles = self.__greatest_common_divisor(wave.num_cycles for wave in self)
 
+        self._num_full_loops = pulse_cycles // self._FULL_LOOP_DENOMINATOR
+        if self._num_full_loops > self._FULL_LOOP_DENOMINATOR:
+            raise ValueError("Too many steps for individual waveform.")
+
+        full_loop_remainder = pulse_cycles % self._FULL_LOOP_DENOMINATOR
+
+        self._final_multiple = full_loop_remainder // 256
+        self._final_remainder = full_loop_remainder % 256
+
         half_cycles = self.max_cycles * 2 // pulse_cycles
 
         self._wave_pulses = []
@@ -185,15 +194,6 @@ class PulseWaveController(OutputController):
             self._wave_pulses.append(
                 pigpio.pulse(pulse_on, pulse_off, microsecond_pulse_time),
             )
-
-        self._num_full_loops = pulse_cycles // self._FULL_LOOP_DENOMINATOR
-        if self._num_full_loops > self._FULL_LOOP_DENOMINATOR:
-            raise ValueError("Too many steps for individual waveform.")
-
-        full_loop_remainder = pulse_cycles % self._FULL_LOOP_DENOMINATOR
-
-        self._final_multiple = full_loop_remainder // 256
-        self._final_remainder = full_loop_remainder % 256
 
     def _create_wave_chain(self):
         """
