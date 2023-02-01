@@ -59,24 +59,32 @@ This example rotates the motor ccw at 1Hz for 1min, then rotates it cw a quarter
 ```python
 from electricipy.raspi.output_devices.motors import stepper
 
-
-step_pin = 18
-direction_pin = 3
-enable_pin = 4
-microstep_pins = [15, 14]
-microsteps = 64
-
-motor = stepper.TMC2209(
-    step_pins,
-    direction_pins,
-    enable_pins,
-    microstep_pins,
-    microsteps,
+motor_drivers = (
+    stepper.TMC2209(
+        step_pin=18,
+        direction_pin=3,
+        enable_pin=4,
+        microstep_pins=(15, 14),
+        microsteps=64,
+        gear_ratio=1.,
+        linear=True,
+        pitch=5e-3,
+    ),
+    stepper.TMC2209(
+        step_pin=13,
+        direction_pin=27,
+        enable_pin=17,
+        microstep_pins=(24, 23),
+        microsteps=64,
+        gear_ratio=1.,
+        linear=False,
+    ),
 )
 
-motor.move_at_speed_for_time(360, 60)
-motor.move_by_angle_in_time(-90, 15)
-motor.move_by_angle_at_speed(360, 360)
+motor_controller = stepper.StepperMotorController(motor_drivers)
+
+motor_controller.move_by_angles_in_time([-720, 720], 6)
+motor_controller.move_by_angles_in_time([720, -720], 6)
 ```
 
 ### Servo control
