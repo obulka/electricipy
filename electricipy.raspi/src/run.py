@@ -55,31 +55,29 @@ def stepper_test():
 
 def servo_test():
     """"""
-    servo_manager = servo.ServoMotorManager.sg90_manager([19])
-    # servo_manager = servo.ServoMotorManager.hk15148b_manager([19])
+    servo_controller = servo.ServoController((servo.HK15148B(5),))# servo.HK15148B(5)))
 
-    try:
-        while True:
-            with servo_manager[0]:
-                servo_manager[0].angle = 10
-                time.sleep(2)
-                servo_manager[0].angle = -10
-                time.sleep(2)
-                servo_manager[0].angle = 20
-                time.sleep(2)
-                servo_manager[0].angle = -20
-                time.sleep(2)
-                servo_manager[0].max()
-                time.sleep(2)
-                servo_manager[0].mid()
-                time.sleep(2)
-                servo_manager[0].min()
-                time.sleep(2)
-                servo_manager[0].mid()
-                time.sleep(2)
-
-    except KeyboardInterrupt:
-        print("Program stopped")
+    with servo_controller:
+        servo_controller.go_to_angles([10, -10])
+        time.sleep(2)
+        servo_controller.go_to_angles([-10, 10])
+        time.sleep(2)
+        servo_controller.go_to_angles([20, -20])
+        time.sleep(2)
+        servo_controller.go_to_angles([-20, 20])
+        time.sleep(2)
+        servo_controller.max()
+        time.sleep(2)
+        servo_controller.mid()
+        time.sleep(2)
+        servo_controller.min()
+        time.sleep(2)
+        servo_controller.mid(0)
+        time.sleep(2)
+        servo_controller.min(0)
+        time.sleep(2)
+        servo_controller.max(0)
+        time.sleep(2)
 
 
 def esc_test():
@@ -108,9 +106,9 @@ def main():
 
     start_time = time.time()
 
-    stepper_test()
+    # stepper_test()
     # esc_test()
-    # servo_test()
+    servo_test()
     # switch_test()
 
     print("--- %s seconds ---" % (time.time() - start_time))

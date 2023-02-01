@@ -25,8 +25,6 @@ import time
 import pigpio
 
 # Local Imports
-from electricipy.raspi.gpio_controller import GPIOManager
-
 from .. import OutputController
 from ..signals.waves import FiniteWaveForm, PulseWaveController
 

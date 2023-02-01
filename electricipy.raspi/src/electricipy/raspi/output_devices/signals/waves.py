@@ -8,8 +8,6 @@ import math
 import pigpio
 
 # Local Imports
-from electricipy.raspi.gpio_controller import GPIOManager
-
 from .. import OutputController
 
 
