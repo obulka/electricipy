@@ -48,6 +48,21 @@ class PWMSignal:
             self.min_pulse_width
         )
 
+    @property
+    def percentage(self) -> float:
+        """ The percentage of the maximum pulse width being run.
+        This is in the range [0, 1].
+        """
+        return (self.max_pulse_width - self.min_pulse_width) / self.min_pulse_width
+
+    @percentage.setter
+    def percentage(self, new_percentage: float) -> None:
+        self.pulse_width = (
+            new_percentage
+            * (self.max_pulse_width - self.min_pulse_width)
+            + self.min_pulse_width
+        )
+
     def min(self) -> None:
         """"""
         self.pulse_width = self.min_pulse_width
@@ -103,6 +118,13 @@ class PWMController(OutputController):
                 pwm_signal.pin,
                 pwm_signal.pulse_width,
             )
+
+    def run_at_percentages(self, percentages):
+        """"""
+        for pwm_signal, percentage in zip(self, percentages):
+            pwm_signal.percentage = percentage
+
+        self.update()
 
     def min(self, index=-1):
         """"""

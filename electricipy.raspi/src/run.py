@@ -55,16 +55,25 @@ def stepper_test():
 
 def servo_test():
     """"""
-    servo_controller = servo.ServoController((servo.HK15148B(5),))# servo.HK15148B(5)))
+    servo_controller = servo.ServoController((
+        servo.HK15148B(
+            19,
+            max_pulse_width=1225, # My servos don't like large pulse widths
+        ),
+        servo.SG90(
+            20,
+            max_pulse_width=1300,
+        ),
+    ))
 
     with servo_controller:
-        servo_controller.go_to_angles([10, -10])
+        servo_controller.go_to_positions([10, -10])
+        time.sleep(5)
+        servo_controller.go_to_positions([-10, 10])
+        time.sleep(5)
+        servo_controller.go_to_positions([20, -20])
         time.sleep(2)
-        servo_controller.go_to_angles([-10, 10])
-        time.sleep(2)
-        servo_controller.go_to_angles([20, -20])
-        time.sleep(2)
-        servo_controller.go_to_angles([-20, 20])
+        servo_controller.go_to_positions([-20, 20])
         time.sleep(2)
         servo_controller.max()
         time.sleep(2)

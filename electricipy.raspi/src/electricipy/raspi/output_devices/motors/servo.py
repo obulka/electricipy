@@ -25,39 +25,50 @@ from ..signals.pwm import PWMController, PWMSignal
 class Servo(PWMSignal):
     """"""
 
-    min_angle: float = -90
-    max_angle: float = 90
+    min_position: float = -90
+    max_position: float = 90
+
+    @property
+    def position(self):
+        """ The servo position, whether this is angualr or linear
+        position is up to the user.
+        """
+        return self.pulse_width_to_position(self.pulse_width)
+
+    @position.setter
+    def position(self, new_position):
+        self.pulse_width = self.position_to_pulse_width(new_position)
 
     @property
     def angle(self):
-        """"""
-        return self.pulse_width_to_angle(self.pulse_width)
+        """ The servo angle, equivalent to the position. """
+        return self.position
 
     @angle.setter
     def angle(self, new_angle):
-        self.pulse_width = self.angle_to_pulse_width(new_angle)
+        self.position = new_angle
 
     @property
-    def mid_angle(self):
+    def mid_position(self):
         """"""
-        return self.min_angle + (self.max_angle - self.min_angle) / 2
+        return self.min_position + (self.max_position - self.min_position) / 2
 
-    def angle_to_pulse_width(self, angle):
+    def position_to_pulse_width(self, position):
         """"""
         return (
             (self.max_pulse_width - self.min_pulse_width)
-            / (self.max_angle - self.min_angle)
-            * (angle - self.min_angle)
+            / (self.max_position - self.min_position)
+            * (position - self.min_position)
             + self.min_pulse_width
         )
 
-    def pulse_width_to_angle(self, pulse_width):
+    def pulse_width_to_position(self, pulse_width):
         """"""
         return (
-            (self.max_angle - self.min_angle)
+            (self.max_position - self.min_position)
             / (self.max_pulse_width - self.min_pulse_width)
             * (pulse_width - self.min_pulse_width)
-            + self.min_angle
+            + self.min_position
         )
 
 
@@ -71,29 +82,34 @@ class HK15148B(Servo):
     """"""
     min_angle: float = -30
     max_angle: float = 30
-    min_pulse_width: float = 1000
-    max_pulse_width: float = 2000
 
 
 class ServoController(PWMController):
     """"""
 
-    def go_to_angle(self, index, angle):
+    def go_to(self, position, index=-1):
         """"""
-        self[index].angle = angle
-        self.update()
-
-    def go_to_angles(self, angles):
-        """"""
-        for servo, angle in zip(self, angles):
-            servo.angle = angle
+        if index >= 0:
+            self[index].position = position
+        else:
+            for servo in self:
+                servo.position = position
 
         self.update()
 
-    def go_to_angles_for_time(self, angles, time):
+    def go_to_positions(self, positions):
+        """ Move the servos to the specified positions, whether they be
+        angular or linear positions.
+        """
+        for servo, position in zip(self, positions):
+            servo.position = position
+
+        self.update()
+
+    def go_to_position_for_time(self, positions, time):
         """"""
-        for servo, angle in zip(self, angles):
-            servo.angle = angle
+        for servo, position in zip(self, positions):
+            servo.servo = position
 
         with self:
             self.update()
