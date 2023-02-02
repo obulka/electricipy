@@ -246,11 +246,15 @@ class StepperMotorController(OutputController):
         """ Setup for whatever control routine the child implements. """
         super().__enter__()
 
-        with ExitStack() as stack:
-            if self._wave:
-                stack.enter_context(self._wave)
+        try:
+            with ExitStack() as stack:
+                if self._wave:
+                    stack.enter_context(self._wave)
 
-            self._stack = stack.pop_all()
+                self._stack = stack.pop_all()
+        except pigpio.error:
+            self._cleanup_gpio()
+            raise
 
     def __exit__(self, exception_type, exception_value, exception_traceback):
         """ Exit and clean up after the routine.

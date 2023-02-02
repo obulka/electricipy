@@ -49,12 +49,21 @@ def stepper_test():
 
     motor_controller = stepper.StepperMotorController(motor_drivers)
 
-    motor_controller.move_by_angles_in_time([-720, 720], 6)
-    motor_controller.move_by_angles_in_time([720, -720], 6)
+    # motor_controller.move_by_angles_in_time([-180, 75], 2)
+    # motor_controller.move_by_angles_in_time([180, -75], 2)
+    motor_controller.move_by_angles_in_time([-720, 360], 2)
+    motor_controller.move_by_angles_in_time([720, -360], 2)
 
 
 def servo_test():
-    """"""
+    """ Test some servos.
+
+    You can find the max and min pulse width by repeatedly running:
+    `pigs s [pin] [pulse width]` in a terminal, and changing the pulse
+    width until the servo has moved to its limit, and backing off that
+    pulse width limit still affects the servo position, then note the
+    values.
+    """
     servo_controller = servo.ServoController((
         servo.HK15148B(
             19,
@@ -73,19 +82,11 @@ def servo_test():
         time.sleep(5)
         servo_controller.go_to_positions([20, -20])
         time.sleep(2)
-        servo_controller.go_to_positions([-20, 20])
-        time.sleep(2)
         servo_controller.max()
-        time.sleep(2)
-        servo_controller.mid()
         time.sleep(2)
         servo_controller.min()
         time.sleep(2)
         servo_controller.mid(0)
-        time.sleep(2)
-        servo_controller.min(0)
-        time.sleep(2)
-        servo_controller.max(0)
         time.sleep(2)
 
 
@@ -115,9 +116,9 @@ def main():
 
     start_time = time.time()
 
-    # stepper_test()
+    stepper_test()
     # esc_test()
-    servo_test()
+    # servo_test()
     # switch_test()
 
     print("--- %s seconds ---" % (time.time() - start_time))

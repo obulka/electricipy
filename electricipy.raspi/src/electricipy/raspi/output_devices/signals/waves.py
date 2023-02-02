@@ -39,6 +39,7 @@ class PulseWaveController(OutputController):
     """"""
 
     _FULL_LOOP_DENOMINATOR = 256 * 255 + 255
+    _MAX_PULSES_PER_SOCKET_MESSAGE = 5461
 
 
     def __init__(self, waves, time, pi_connection=None):
@@ -68,7 +69,7 @@ class PulseWaveController(OutputController):
             pi_connection=pi_connection
         )
 
-        self._id = None
+        self._ids = []
 
         self._wave_pulses = []
         self._num_full_loops = 0
@@ -96,7 +97,9 @@ class PulseWaveController(OutputController):
 
     @property
     def waves(self):
-        """  list(FiniteWaveForm): The waves being controlled. """
+        """  list(FiniteWaveForm): The waves being controlled in order
+        from shortest to longest period.
+        """
         return self._waves
 
     @waves.setter
@@ -131,19 +134,38 @@ class PulseWaveController(OutputController):
 
     def _initialize_gpio(self):
         """ Initialize the GPIO pins. """
-        self._pi.wave_add_generic(self._wave_pulses)
-
         super()._initialize_gpio()
 
-        self._id = self._id or self._pi.wave_create()
+        try:
+            # There is a limit to the number of pulses that can be sent over
+            # the socket at a time, so we must break large amounts of wave
+            # pulses up into smaller chunks, and even then if we don't split
+            # it into multiple waves, only the final message will be used.
+            range_start = 0
+            range_end = self._MAX_PULSES_PER_SOCKET_MESSAGE
+            for _ in range(len(self._wave_pulses) // self._MAX_PULSES_PER_SOCKET_MESSAGE):
+                self._pi.wave_add_generic(self._wave_pulses[range_start:range_end])
+                self._ids.append(self._pi.wave_create())
+
+                range_start = range_end
+                range_end += self._MAX_PULSES_PER_SOCKET_MESSAGE
+
+            # Add the remainder of the pulses
+            self._pi.wave_add_generic(self._wave_pulses[range_start:])
+
+            self._ids.append(self._pi.wave_create())
+
+        except pigpio.error:
+            self._cleanup_gpio()
+            raise
 
     def _cleanup_gpio(self):
         """ Reset all pins to cleanup. """
         super()._cleanup_gpio()
 
-        if self._id is not None:
-            self._pi.wave_delete(self._id)
-            self._id = None
+        self._pi.wave_clear()
+
+        self._ids = []
 
     @staticmethod
     def __greatest_common_divisor(number_generator):
@@ -162,7 +184,10 @@ class PulseWaveController(OutputController):
 
         self._num_full_loops = pulse_cycles // self._FULL_LOOP_DENOMINATOR
         if self._num_full_loops > self._FULL_LOOP_DENOMINATOR:
-            raise ValueError("Too many steps for individual waveform.")
+            raise ValueError(
+                f"Too many pulse cycles for individual waveform: {pulse_cycles}"
+                f"/{self._FULL_LOOP_DENOMINATOR**2 + self._FULL_LOOP_DENOMINATOR}"
+            )
 
         full_loop_remainder = pulse_cycles % self._FULL_LOOP_DENOMINATOR
 
@@ -206,14 +231,14 @@ class PulseWaveController(OutputController):
             wave_chain.extend([
                 255, 0,                # Start loop
                     255, 0,            # Start loop
-                        self._id,      # Transmit wave
+                        *self._ids,    # Transmit waves
                     255, 1, 255, 255,  # Repeat 255 + 255 * 256 times
                 255, 1,                # Repeat as many full loops as necessary
                 self._num_full_loops % 256, self._num_full_loops // 256,
             ])
         wave_chain.extend([
             255, 0,                    # Start loop
-                self._id,              # Create wave
+                *self._ids,            # Transmit waves
             255, 1,                    # Repeat for the remaining steps 
             self._final_remainder, self._final_multiple,
         ])
