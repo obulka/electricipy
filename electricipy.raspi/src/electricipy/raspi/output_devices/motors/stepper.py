@@ -26,7 +26,7 @@ import pigpio
 
 # Local Imports
 from .. import OutputController
-from ..signals.waves import FiniteWaveForm, PulseWaveController
+from ..signals.waves import FiniteWaveform, PulseWaveController
 
 
 @dataclass
@@ -36,7 +36,7 @@ class StepperMotorDriver:
     Args:
             step_pin (int): The step pin number to use.
             direction_pin (int): The direction pin number to use.
-            microstep_pins (tuple(int,)): The pin numbers for the
+            microstep_pins (list(int)): The pin numbers for the
                 microstep settings. (MS2, MS1)
             microsteps (int):
                 The number of microsteps to perform. If you have hard
@@ -61,7 +61,7 @@ class StepperMotorDriver:
     step_pin: int
     direction_pin: int
     enable_pin: int
-    microstep_pins: tuple
+    microstep_pins: list
     microsteps: int
     _microsteps: int = field(init=False, repr=False, default=1)
     gear_ratio: float = 1.
@@ -144,6 +144,22 @@ class StepperMotorDriver:
             / 360.
         )
 
+    def steps_to_angle(self, steps: int) -> float:
+        """ Convert a number of degrees to the closest number of steps.
+
+        Args:
+            steps (int): The number of steps.
+
+        Returns:
+            float: The equivalent angle.
+        """
+        return (
+            steps * 360
+            / self.gear_ratio
+            / self._FULL_STEPS_PER_TURN
+            / self._microsteps
+        )
+
     def angular_speed_to_step_speed(self, speed: float) -> float:
         """ Convert a speed in degrees/second to steps/second.
 
@@ -158,7 +174,7 @@ class StepperMotorDriver:
             * self._FULL_STEPS_PER_TURN
             * self._microsteps
             * speed
-            / 360.
+            / 360
         )
 
     def angular_speed_to_step_period(self, speed: float) -> float:
@@ -216,13 +232,13 @@ class TMC2209(StepperMotorDriver):
 class StepperMotorController(OutputController):
     """ Base class for control of stepper motors. """
 
-    def __init__(self, stepper_drivers, pi_connection=None):
+    def __init__(self, stepper_drivers: list, pi_connection=None):
         """ Stepper motor control class.
 
         Note: Uses BCM mode for compatibility with pigpio.
 
         Args:
-            stepper_drivers (tuple(StepperMotorDriver)): The stepper
+            stepper_drivers (list(StepperMotorDriver)): The stepper
                 motors to control.
 
         Keyword Args:
@@ -233,41 +249,12 @@ class StepperMotorController(OutputController):
         """
         self._stepper_drivers = stepper_drivers
 
-        pins = tuple()
-        for stepper_driver in self:
-            pins += stepper_driver.pins
+        super().__init__(
+            [pin for stepper_driver in self for pin in stepper_driver.pins],
+            pi_connection=pi_connection,
+        )
 
-        super().__init__(pins, pi_connection=pi_connection)
-
-        self._stack = None
-        self._wave = None
-
-    def __enter__(self):
-        """ Setup for whatever control routine the child implements. """
-        super().__enter__()
-
-        try:
-            with ExitStack() as stack:
-                if self._wave:
-                    stack.enter_context(self._wave)
-
-                self._stack = stack.pop_all()
-        except pigpio.error:
-            self._cleanup_gpio()
-            raise
-
-    def __exit__(self, exception_type, exception_value, exception_traceback):
-        """ Exit and clean up after the routine.
-
-        Args:
-            exception_type (Exception): Indicates class of exception.
-            exception_value (str): Indicates the type of exception.
-            exception_traceback (traceback):
-                Report which has all of the information needed to solve
-                the exception.
-        """
-        super().__exit__(exception_type, exception_value, exception_traceback)
-        self._stack.__exit__(exception_type, exception_value, exception_traceback)
+        self._waves = []
 
     def __getitem__(self, index):
         return self._stepper_drivers[index]
@@ -290,7 +277,7 @@ class StepperMotorController(OutputController):
                 self._pi.write(pin, pin_value)
 
     def _cleanup_gpio(self):
-        """ Reset all pins to low to cleanup. """
+        """ Reset all pins to cleanup. """
         super()._cleanup_gpio()
 
         for stepper_driver in self:
@@ -302,18 +289,20 @@ class StepperMotorController(OutputController):
 
     @property
     def waves(self):
-        return self._wave
+        return self._waves
 
     def _run(self):
         """ Step the motor through the loaded wave function. """
         with self:
-            self._wave.run()
+            for wave in self._waves:
+                with wave:
+                    wave.run()
 
-            # Wait for wave to finish transmission
-            while self._pi.wave_tx_busy():
-                if self._stop:
-                    break
-                time.sleep(self._wave.min_period)
+                    # Wait for wave to finish transmission
+                    while self._pi.wave_tx_busy():
+                        if self._stop:
+                            break
+                        time.sleep(wave.min_period)
 
     def prepare_to_move_by_angles_in_time(self, angles, time):
         """ Load the waveform required to move the motor a number of
@@ -332,9 +321,13 @@ class StepperMotorController(OutputController):
 
             steps = stepper_driver.angle_to_steps(abs(angle))
 
-            wave_data.append(FiniteWaveForm(stepper_driver.step_pin, steps))
+            wave_data.append(FiniteWaveform(stepper_driver.step_pin, steps))
 
-        self._wave = PulseWaveController(wave_data, time, pi_connection=self._pi)
+        # TODO make this internal and a part of the instance and use the gcd
+        # when determining the number of splits
+        split_wave_data = PulseWaveController.split_waveforms(wave_data)
+        for wave_data in split_wave_data:
+            self._waves.append(PulseWaveController(wave_data, time, pi_connection=self._pi))
 
     def prepare_to_move_at_speeds_for_time(self, speeds, time):
         """ Load the waveform required to move the motors a number of

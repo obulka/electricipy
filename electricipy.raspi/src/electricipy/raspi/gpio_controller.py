@@ -30,7 +30,7 @@ class GPIOController:
         """ Initialize the controller.
 
         Args:
-            pins (tuple(int)): The pins to control.
+            pins (list(int)): The pins to control.
 
         Keyword Args:
             pi_connection (pigpio.pi):

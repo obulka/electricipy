@@ -12,7 +12,7 @@ from .. import OutputController
 
 
 @dataclass
-class FiniteWaveForm:
+class FiniteWaveform:
     """ Data needed to create a waveform with a fixed number of cycles.
 
     Args:
@@ -39,7 +39,7 @@ class PulseWaveController(OutputController):
     """"""
 
     _FULL_LOOP_DENOMINATOR = 256 * 255 + 255
-    _MAX_PULSES_PER_SOCKET_MESSAGE = 5461
+    MAX_PULSES_PER_SOCKET_MESSAGE = 5461
 
 
     def __init__(self, waves, time, pi_connection=None):
@@ -49,7 +49,7 @@ class PulseWaveController(OutputController):
         overridden in order to conform with the time arg.
 
         Args:
-            waves (list(FiniteWaveForm)): The waves to control.
+            waves (list(FiniteWaveform)): The waves to control.
             time (float): The amount of time to synchronously complete
                 the waves.
 
@@ -61,11 +61,14 @@ class PulseWaveController(OutputController):
         Raises:
             ValueError:
                 If a raspberry pi connection cannot be established,
-                the wave exceeds the maximum steps (4294901760), or no
+                the wave exceeds the maximum cycles (4294901760), or no
                 waves are provided.
         """
+        if not waves:
+            raise ValueError("At least one wave must be provided.")
+
         super().__init__(
-            (wave.pin for wave in waves),
+            [wave.pin for wave in waves],
             pi_connection=pi_connection
         )
 
@@ -91,13 +94,13 @@ class PulseWaveController(OutputController):
         """ Add a new wave to be controlled.
 
         Args:
-            wave (FiniteWaveForm): The wave to control.
+            wave (FiniteWaveform): The wave to control.
         """
         self.waves = self._waves + [wave]
 
     @property
     def waves(self):
-        """  list(FiniteWaveForm): The waves being controlled in order
+        """  list(FiniteWaveform): The waves being controlled in order
         from shortest to longest period.
         """
         return self._waves
@@ -108,7 +111,7 @@ class PulseWaveController(OutputController):
             raise ValueError("At least one wave must be provided.")
 
         self._waves = sorted(new_waves, key=lambda wave: wave.period)
-        self._pins = (wave.pin for wave in self)
+        self._pins = [wave.pin for wave in self]
 
         self._update_waveform()
 
@@ -142,13 +145,13 @@ class PulseWaveController(OutputController):
             # pulses up into smaller chunks, and even then if we don't split
             # it into multiple waves, only the final message will be used.
             range_start = 0
-            range_end = self._MAX_PULSES_PER_SOCKET_MESSAGE
-            for _ in range(len(self._wave_pulses) // self._MAX_PULSES_PER_SOCKET_MESSAGE):
+            range_end = self.MAX_PULSES_PER_SOCKET_MESSAGE
+            for _ in range(len(self._wave_pulses) // self.MAX_PULSES_PER_SOCKET_MESSAGE):
                 self._pi.wave_add_generic(self._wave_pulses[range_start:range_end])
                 self._ids.append(self._pi.wave_create())
 
                 range_start = range_end
-                range_end += self._MAX_PULSES_PER_SOCKET_MESSAGE
+                range_end += self.MAX_PULSES_PER_SOCKET_MESSAGE
 
             # Add the remainder of the pulses
             self._pi.wave_add_generic(self._wave_pulses[range_start:])
@@ -166,6 +169,39 @@ class PulseWaveController(OutputController):
         self._pi.wave_clear()
 
         self._ids = []
+
+    @staticmethod
+    def split_waveforms(waveforms):
+        """"""
+        max_allowed_cycles_per_waveform = PulseWaveController.MAX_PULSES_PER_SOCKET_MESSAGE // 2
+        print(f"max_allowed_cycles_per_waveform {max_allowed_cycles_per_waveform}")
+        max_cycles_in_movement = max([wave.num_cycles for wave in waveforms])
+        print(f"max_cycles_in_movement {max_cycles_in_movement}")
+
+        num_splits = max_cycles_in_movement // max_allowed_cycles_per_waveform
+        print(f"num_splits {num_splits}")
+
+        split_waveforms = []
+        for split_num in range(num_splits):
+            split_waveform = []
+            for waveform in waveforms:
+                cycles = waveform.num_cycles // num_splits
+                print(f"had {waveform.num_cycles}")
+                split_waveform.append(FiniteWaveform(waveform.pin, cycles))
+                print(f"adding cycles {cycles} on {waveform.pin}")
+
+            split_waveforms.append(split_waveform)
+
+        remaining_waveform = []
+        for waveform in waveforms:
+            cycles = waveform.num_cycles % num_splits
+            if cycles > 0:
+                remaining_waveform.append(FiniteWaveform(waveform.pin, cycles))
+                print(f"adding cycles {cycles} on {waveform.pin}")
+
+        split_waveforms.append(remaining_waveform)
+
+        return split_waveforms
 
     @staticmethod
     def __greatest_common_divisor(number_generator):
@@ -239,7 +275,7 @@ class PulseWaveController(OutputController):
         wave_chain.extend([
             255, 0,                    # Start loop
                 *self._ids,            # Transmit waves
-            255, 1,                    # Repeat for the remaining steps 
+            255, 1,                    # Repeat for the remaining cycles 
             self._final_remainder, self._final_multiple,
         ])
 
