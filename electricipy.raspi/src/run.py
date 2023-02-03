@@ -25,7 +25,7 @@ from electricipy.raspi.output_devices.motors import servo, stepper, brushless
 
 def stepper_test():
     """"""
-    motor_drivers = (
+    motor_controller = stepper.StepperMotorController([
         stepper.TMC2209(
             step_pin=18,
             direction_pin=3,
@@ -45,9 +45,7 @@ def stepper_test():
             gear_ratio=1.,
             linear=False,
         ),
-    )
-
-    motor_controller = stepper.StepperMotorController(motor_drivers)
+    ])
 
     motor_controller.move_by_angles_in_time([-720, 320], 2)
     motor_controller.move_by_angles_in_time([720, -320], 2)
@@ -64,7 +62,7 @@ def servo_test():
     pulse width limit still affects the servo position, then note the
     values.
     """
-    servo_controller = servo.ServoController((
+    servo_controller = servo.ServoController([
         servo.HK15148B(
             19,
             max_pulse_width=1225, # My servos don't like large pulse widths
@@ -73,7 +71,7 @@ def servo_test():
             20,
             max_pulse_width=1300,
         ),
-    ))
+    ])
 
     with servo_controller:
         servo_controller.go_to_positions([10, -10])
