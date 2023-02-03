@@ -184,9 +184,9 @@ class PulseWaveController(OutputController):
             pulse_on = 0
             pulse_off = 0
             for wave in self:
-                binary_pin = 1 << wave.pin
+                pin_mask = 1 << wave.pin
                 pulse_contribution = (
-                    binary_pin
+                    pin_mask
                     * (
                         half_cycle
                         % (half_cycles // (wave.num_cycles // pulse_cycles))
@@ -195,7 +195,7 @@ class PulseWaveController(OutputController):
                 )
 
                 pulse_on |= pulse_contribution
-                pulse_off |= binary_pin * (pulse_contribution == 0)
+                pulse_off |= pin_mask * (pulse_contribution == 0)
 
             self._wave_pulses.append(
                 pigpio.pulse(pulse_on, pulse_off, microsecond_pulse_time),
