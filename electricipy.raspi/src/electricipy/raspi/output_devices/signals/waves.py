@@ -227,6 +227,13 @@ class PulseWaveController(OutputController):
 
         return wave_chain
 
+    def wait_for_transmission(self):
+        """ Wait for wave to finish transmission. """
+        while self._pi.wave_tx_busy():
+            if self._stop:
+                break
+            time.sleep(self.min_period)
+
     def run(self):
         """"""
         wave_pulses = self._wave_pulses
@@ -259,8 +266,4 @@ class PulseWaveController(OutputController):
 
                 wave_pulses = wave_pulses[remaining_pulses:]
 
-                # Wait for wave to finish transmission
-                while self._pi.wave_tx_busy():
-                    if self._stop:
-                        break
-                    time.sleep(self.min_period)
+                self.wait_for_transmission()
