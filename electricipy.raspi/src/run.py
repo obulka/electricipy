@@ -49,8 +49,8 @@ def stepper_test():
 
     motor_controller = stepper.StepperMotorController(motor_drivers)
 
-    # motor_controller.move_by_angles_in_time([-180, 75], 2)
-    # motor_controller.move_by_angles_in_time([180, -75], 2)
+    motor_controller.move_by_angles_in_time([-720, 320], 2)
+    motor_controller.move_by_angles_in_time([720, -320], 2)
     motor_controller.move_by_angles_in_time([-720, 360], 2)
     motor_controller.move_by_angles_in_time([720, -360], 2)
 

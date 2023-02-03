@@ -17,12 +17,7 @@ limitations under the License.
 This module contains stepper motor controls.
 """
 # Standard Imports
-from contextlib import ExitStack
 from dataclasses import dataclass, field
-import time
-
-# 3rd Party Imports
-import pigpio
 
 # Local Imports
 from .. import OutputController
@@ -254,7 +249,7 @@ class StepperMotorController(OutputController):
             pi_connection=pi_connection,
         )
 
-        self._waves = []
+        self._wave = None
 
     def __getitem__(self, index):
         return self._stepper_drivers[index]
@@ -287,22 +282,20 @@ class StepperMotorController(OutputController):
             for pin in stepper_driver.microstep_pins:
                 self._pi.write(pin, False)
 
+    def stop(self):
+        """ Stops the current routine immediately. """
+        if self._wave:
+            self._wave.stop()
+        super().stop()
+
     @property
-    def waves(self):
-        return self._waves
+    def wave(self):
+        return self._wave
 
     def _run(self):
         """ Step the motor through the loaded wave function. """
         with self:
-            for wave in self._waves:
-                with wave:
-                    wave.run()
-
-                    # Wait for wave to finish transmission
-                    while self._pi.wave_tx_busy():
-                        if self._stop:
-                            break
-                        time.sleep(wave.min_period)
+            self._wave.run()
 
     def prepare_to_move_by_angles_in_time(self, angles, time):
         """ Load the waveform required to move the motor a number of
@@ -323,11 +316,7 @@ class StepperMotorController(OutputController):
 
             wave_data.append(FiniteWaveform(stepper_driver.step_pin, steps))
 
-        # TODO make this internal and a part of the instance and use the gcd
-        # when determining the number of splits
-        split_wave_data = PulseWaveController.split_waveforms(wave_data)
-        for wave_data in split_wave_data:
-            self._waves.append(PulseWaveController(wave_data, time, pi_connection=self._pi))
+        self._wave = PulseWaveController(wave_data, time, pi_connection=self._pi)
 
     def prepare_to_move_at_speeds_for_time(self, speeds, time):
         """ Load the waveform required to move the motors a number of

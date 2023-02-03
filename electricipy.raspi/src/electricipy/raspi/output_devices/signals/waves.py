@@ -3,6 +3,7 @@
 # Standard Imports
 from dataclasses import dataclass
 import math
+import time
 
 # 3rd Party Imports
 import pigpio
@@ -38,8 +39,12 @@ class FiniteWaveform:
 class PulseWaveController(OutputController):
     """"""
 
+    _MAX_PULSES_PER_SOCKET_MESSAGE = 5461
+    _MAX_PULSES_IN_MEMORY = 11916
+    _MAX_FULL_SOCKET_MESSAGES_IN_MEMORY = _MAX_PULSES_IN_MEMORY // _MAX_PULSES_PER_SOCKET_MESSAGE
+    _MAX_SOCKET_MESSAGE_REMAINDER = _MAX_PULSES_IN_MEMORY % _MAX_PULSES_PER_SOCKET_MESSAGE
+
     _FULL_LOOP_DENOMINATOR = 256 * 255 + 255
-    MAX_PULSES_PER_SOCKET_MESSAGE = 5461
 
 
     def __init__(self, waves, time, pi_connection=None):
@@ -74,6 +79,8 @@ class PulseWaveController(OutputController):
 
         self._ids = []
 
+        self._waves = []
+        self._split_waves = []
         self._wave_pulses = []
         self._num_full_loops = 0
         self._final_multiple = 0
@@ -135,33 +142,6 @@ class PulseWaveController(OutputController):
         """"""
         return self[0].num_cycles
 
-    def _initialize_gpio(self):
-        """ Initialize the GPIO pins. """
-        super()._initialize_gpio()
-
-        try:
-            # There is a limit to the number of pulses that can be sent over
-            # the socket at a time, so we must break large amounts of wave
-            # pulses up into smaller chunks, and even then if we don't split
-            # it into multiple waves, only the final message will be used.
-            range_start = 0
-            range_end = self.MAX_PULSES_PER_SOCKET_MESSAGE
-            for _ in range(len(self._wave_pulses) // self.MAX_PULSES_PER_SOCKET_MESSAGE):
-                self._pi.wave_add_generic(self._wave_pulses[range_start:range_end])
-                self._ids.append(self._pi.wave_create())
-
-                range_start = range_end
-                range_end += self.MAX_PULSES_PER_SOCKET_MESSAGE
-
-            # Add the remainder of the pulses
-            self._pi.wave_add_generic(self._wave_pulses[range_start:])
-
-            self._ids.append(self._pi.wave_create())
-
-        except pigpio.error:
-            self._cleanup_gpio()
-            raise
-
     def _cleanup_gpio(self):
         """ Reset all pins to cleanup. """
         super()._cleanup_gpio()
@@ -169,39 +149,6 @@ class PulseWaveController(OutputController):
         self._pi.wave_clear()
 
         self._ids = []
-
-    @staticmethod
-    def split_waveforms(waveforms):
-        """"""
-        max_allowed_cycles_per_waveform = PulseWaveController.MAX_PULSES_PER_SOCKET_MESSAGE // 2
-        print(f"max_allowed_cycles_per_waveform {max_allowed_cycles_per_waveform}")
-        max_cycles_in_movement = max([wave.num_cycles for wave in waveforms])
-        print(f"max_cycles_in_movement {max_cycles_in_movement}")
-
-        num_splits = max_cycles_in_movement // max_allowed_cycles_per_waveform
-        print(f"num_splits {num_splits}")
-
-        split_waveforms = []
-        for split_num in range(num_splits):
-            split_waveform = []
-            for waveform in waveforms:
-                cycles = waveform.num_cycles // num_splits
-                print(f"had {waveform.num_cycles}")
-                split_waveform.append(FiniteWaveform(waveform.pin, cycles))
-                print(f"adding cycles {cycles} on {waveform.pin}")
-
-            split_waveforms.append(split_waveform)
-
-        remaining_waveform = []
-        for waveform in waveforms:
-            cycles = waveform.num_cycles % num_splits
-            if cycles > 0:
-                remaining_waveform.append(FiniteWaveform(waveform.pin, cycles))
-                print(f"adding cycles {cycles} on {waveform.pin}")
-
-        split_waveforms.append(remaining_waveform)
-
-        return split_waveforms
 
     @staticmethod
     def __greatest_common_divisor(number_generator):
@@ -283,4 +230,38 @@ class PulseWaveController(OutputController):
 
     def run(self):
         """"""
-        self._pi.wave_chain(self._create_wave_chain())
+        wave_pulses = self._wave_pulses
+        while wave_pulses:
+            # There is a limit to the number of pulses that can be sent over
+            # the socket at a time, so we must break large amounts of wave
+            # pulses up into smaller chunks, and even then if we don't split
+            # it into multiple waves, only the final message will be used.
+            num_full_messages = min(
+                self._MAX_FULL_SOCKET_MESSAGES_IN_MEMORY,
+                len(wave_pulses) // self._MAX_PULSES_PER_SOCKET_MESSAGE,
+            )
+            if num_full_messages == self._MAX_FULL_SOCKET_MESSAGES_IN_MEMORY:
+                remaining_pulses = self._MAX_SOCKET_MESSAGE_REMAINDER
+            else:
+                remaining_pulses = len(wave_pulses) % self._MAX_PULSES_PER_SOCKET_MESSAGE
+
+            with self:
+                for _ in range(num_full_messages):
+                    self._pi.wave_add_generic(wave_pulses[:self._MAX_PULSES_PER_SOCKET_MESSAGE])
+                    self._ids.append(self._pi.wave_create())
+
+                    wave_pulses = wave_pulses[self._MAX_PULSES_PER_SOCKET_MESSAGE:]
+
+                # Add the remainder of the pulses
+                self._pi.wave_add_generic(wave_pulses[:remaining_pulses])
+                self._ids.append(self._pi.wave_create())
+
+                self._pi.wave_chain(self._create_wave_chain())
+
+                wave_pulses = wave_pulses[remaining_pulses:]
+
+                # Wait for wave to finish transmission
+                while self._pi.wave_tx_busy():
+                    if self._stop:
+                        break
+                    time.sleep(self.min_period)
