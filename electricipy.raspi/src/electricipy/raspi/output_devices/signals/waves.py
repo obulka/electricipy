@@ -80,7 +80,6 @@ class PulseWaveController(OutputController):
         self._ids = []
 
         self._waves = []
-        self._split_waves = []
         self._wave_pulses = []
         self._num_full_loops = 0
         self._final_multiple = 0
