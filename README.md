@@ -59,7 +59,8 @@ This example rotates the motor ccw at 1Hz for 1min, then rotates it cw a quarter
 ```python
 from electricipy.raspi.output_devices.motors import stepper
 
-motor_drivers = (
+
+motor_controller = stepper.StepperMotorController([
     stepper.TMC2209(
         step_pin=18,
         direction_pin=3,
@@ -79,12 +80,10 @@ motor_drivers = (
         gear_ratio=1.,
         linear=False,
     ),
-)
+])
 
-motor_controller = stepper.StepperMotorController(motor_drivers)
-
-motor_controller.move_by_angles_in_time([-720, 720], 6)
-motor_controller.move_by_angles_in_time([720, -720], 6)
+motor_controller.move_by_angles_in_time([-720, 360], 2)
+motor_controller.move_by_angles_in_time([720, -360], 2)
 ```
 
 ### Servo control
@@ -95,21 +94,30 @@ import time
 from electricipy.raspi.output_devices.motors.servo import SG90
 
 
-servo_pin = 19
-servo = AngularServoController(servo_pin)
+servo_controller = servo.ServoController([
+    servo.HK15148B(
+        19,
+        max_pulse_width=1225, # My servos don't like large pulse widths
+    ),
+    servo.SG90(
+        20,
+        max_pulse_width=1300,
+    ),
+])
 
-with servo:
-    servo.angle = 20
+with servo_controller:
+    servo_controller.go_to_positions([10, -10])
+    time.sleep(5)
+    servo_controller.go_to_positions([-10, 10])
+    time.sleep(5)
+    servo_controller.go_to_positions([20, -20])
     time.sleep(2)
-    servo.angle = -20
+    servo_controller.max()
     time.sleep(2)
-    servo.max()
+    servo_controller.min()
     time.sleep(2)
-    servo.mid()
+    servo_controller.mid(0)
     time.sleep(2)
-    servo.min()
-    time.sleep(2)
-
 ```
 
 ### Electronic Speed Controller Driving Brushless Motors
@@ -124,11 +132,8 @@ esc_pin = 19
 esc = brushless.ElectronicSpeedController(esc_pin)
 with esc:
     esc.initialise()
-    print("initialised")
     esc.mid()
-    # esc.max()
     time.sleep(1)
-
 ```
 
 ## Documentation
