@@ -107,15 +107,14 @@ servo_controller = servo.ServoController([
 
 with servo_controller:
     servo_controller.go_to_positions([10, -10])
-    time.sleep(5)
-    servo_controller.go_to_positions([-10, 10])
-    time.sleep(5)
-    servo_controller.go_to_positions([20, -20])
+    time.sleep(2)
+    servo_controller.go_to_positions([-20, 20])
     time.sleep(2)
     servo_controller.max()
     time.sleep(2)
     servo_controller.min()
     time.sleep(2)
+    # Only move the first servo
     servo_controller.mid(0)
     time.sleep(2)
 ```
